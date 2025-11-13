@@ -14,7 +14,7 @@ class Player(val game: Game):
 
   def getLocationInfo =
     s"""You are now in ${Console.BLUE}${this.location}${Console.RESET}.
-        Rooms accessible from here are: ${this.accessibleRooms.filter(_.nonEmpty).map(Console.BLUE + _ + Console.RESET).mkString(", ")}""".stripMargin
+Rooms accessible from here are: ${this.accessibleRooms.filter(_.nonEmpty).map(Console.BLUE + _ + Console.RESET).mkString(", ")}""".stripMargin
 
   def go(newRoom: String) = {
     val lowerCaseAccessibleRooms = this.accessibleRooms.map(_.toLowerCase)
