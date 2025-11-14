@@ -4,3 +4,4 @@ def textWithColour(text: String, color: String): String = color + text + Console
 val commandColour = Console.GREEN
 val ghostColour = Console.RED
 val roomColour = Console.YELLOW
+val itemColour = Console.CYAN

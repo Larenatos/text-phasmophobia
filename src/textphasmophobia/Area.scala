@@ -36,7 +36,7 @@ class Area:
     val parentRoom: Vector[location] = if location.nonEmpty then
       Vector(this.getRoom(location.dropRight(1)).value)
     else
-      Vector(new NothingRoom)
+      Vector.empty
 
     val children = this.getRoom(location).children
     parentRoom ++ children.map(_.value)
@@ -59,6 +59,8 @@ class Area:
   }
 
   def getMapString = {
-    "Map test printout:\nText version of the rooms:\n" + this.printTree(this.rooms, "").mkString("\n")
+    s"""Map test printout:
+       |Text version of the rooms:
+       |${this.printTree(this.rooms, "").mkString("\n")}""".stripMargin
   }
 end Area
