@@ -8,23 +8,24 @@ class Game:
        |You can do that by entering the command: ${textWithColour("start", commandColour)}""".stripMargin
   var helpText =
     s"""Here is a list of ${textWithColour("commands", commandColour)} you can use
-       |${textWithColour("help", commandColour)}      - Commnand to print this message
-       |${textWithColour("start", commandColour)}     - Start an investigation if there is no ongoing investigation
-       |${textWithColour("go <name>", commandColour)} - More to room <name> if it exists and is accessible from where you are now
-       |${textWithColour("take", commandColour)}      - Will take an item from this room if it is here and put it into your inventory
-       |${textWithColour("inventory", commandColour)} - Show all the items in your inventory at this time
-       |${textWithColour("finish", commandColour)}    - Finish an investigation if you are in the truck and you have started an investigation
-       |${textWithColour("quit", commandColour)}      - Quit the whole game program""".stripMargin
+       |${textWithColour("help", commandColour)}       - Commnand to print this message
+       |${textWithColour("start", commandColour)}      - Start an investigation if there is no ongoing investigation
+       |${textWithColour("go <name>", commandColour)}  - More to room <name> if it exists and is accessible from where you are now
+       |${textWithColour("take", commandColour)}       - Will take an item from this room if it is here and put it into your inventory
+       |${textWithColour("inventory", commandColour)}  - Show all the items in your inventory at this time
+       |${textWithColour("use <item>", commandColour)} - Uses <item> from players inventory and you will get a result for using that item
+       |${textWithColour("finish", commandColour)}     - Finish an investigation if you are in the truck and you have started an investigation
+       |${textWithColour("quit", commandColour)}       - Quit the whole game program""".stripMargin
 
   private var turnCount = 0
   var isObjectiveDone = false
   var isGameRunning = false
 
-  val area = new Area
+  val area = Area(this)
   val player = Player(this)
-  private var ghost: Option[Ghost] = None
+  private var ghost: Ghost = Ghost(this)
 
-  def getGhost: Option[Ghost] = this.ghost
+  def getGhost: Ghost = this.ghost
 
   def isOver = this.player.hasQuit
 
@@ -35,7 +36,7 @@ class Game:
       "Game is already running"
     else
       this.isGameRunning = true
-      this.ghost = Some(Ghost(this))
+      this.ghost = Ghost(this)
       s"""You are now in ${textWithColour("truck", roomColour)} outside Tanglewood Drive 6.
          |The house is haunted by a ghost.
          |Your goal is to visit the ghost room and leave.
@@ -47,11 +48,10 @@ class Game:
     if this.isGameRunning then
       if this.player.location.name == "truck" then
         val report =
-          s"""You finished an investigation. Your investigation lasted for ${this.turnCount}
-             |The ghost was ${this.ghost.fold("")(_.kind)} and it's favourite room was ${this.ghost.fold("")(_.favRoom)}""".stripMargin
+          s"""You finished an investigation. Your investigati on lasted for ${this.turnCount} turns
+             |The ghost was ${this.ghost} and it's favourite room was ${this.ghost.favRoom}""".stripMargin
         this.turnCount = 0
         this.isGameRunning = false
-        this.ghost = None
         report
       else
         "You need to be in the truck to be able to leave"

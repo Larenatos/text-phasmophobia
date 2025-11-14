@@ -6,9 +6,9 @@ sealed trait location:
 
   def takeItem(itemName: String): Item = {
     this.items.find(_.name == itemName) match {
-      case Some(value) => {
+      case Some(item) => {
         this.items = this.items.filter(_.name != itemName)
-        value
+        item
       }
     }
   }
@@ -24,9 +24,9 @@ sealed trait location:
   override def toString: String = textWithColour(this.name, roomColour)
 end location
 
-class Truck extends location:
+class Truck(game: Game) extends location:
   val name = "truck"
-  var items: Vector[Item] = Vector(new Thermometer)
+  var items: Vector[Item] = Vector(Thermometer(game))
 end Truck
 
 class Room(val name: String) extends location:

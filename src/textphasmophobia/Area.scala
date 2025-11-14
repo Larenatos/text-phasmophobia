@@ -2,9 +2,9 @@ package textphasmophobia
 
 case class Node[location](value: location, children: Vector[Node[location]])
 
-class Area:
+class Area(game: Game):
   val rooms: Node[location] =
-    Node(new Truck, Vector(
+    Node(Truck(game), Vector(
       Node(new Room("foyer"), Vector(
         Node(new Room("boy bedroom"), Vector.empty),
         Node(new Room("bathroom"), Vector.empty),

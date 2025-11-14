@@ -53,6 +53,18 @@ class Player(val game: Game):
          |${this.getLocationInfo}""".stripMargin
   }
 
+  def use(itemName: String): String = {
+    if this.location.name == "truck" then
+      "You can't use items while in the truck"
+    else
+      this.inventory.find(_.name == itemName) match {
+        case Some(item) => {
+          item.use + "\n" + this.getLocationInfo
+        }
+        case None => s"You"
+      }
+  }
+
   def getInventoryText = {
     val text = if this.getInventory.nonEmpty then s"Your inventory contains (${this.inventory.length}/2): ${this.getInventory.mkString(", ")}\n" else "Your inventory is empty (0/2)\n"
     text + this.getLocationInfo
