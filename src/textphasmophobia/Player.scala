@@ -12,11 +12,11 @@ class Player(val game: Game):
   private def updateAccessibleRooms(): Unit =
     this.accessibleRooms = this.game.area.getAccessibleRooms(this.mapLocation)
 
-  private def accessibleRoomNames = this.accessibleRooms.map(_.toString)
+  private def accessibleRoomNames = this.accessibleRooms.filter(_.name.nonEmpty).map(_.toString)
 
   def getLocationInfo =
-    s"""You are now in ${Console.BLUE}${this.location}${Console.RESET}.
-Rooms accessible from here are: ${this.accessibleRoomNames.filter(_.nonEmpty).mkString(", ")}"""
+    s"""You are now in ${this.location.toString}.
+    |Rooms accessible from here are: ${this.accessibleRoomNames.mkString(", ")}""".stripMargin
 
   def go(newRoom: String) = {
     val roomNames = this.accessibleRooms.map(_.name)
@@ -31,7 +31,7 @@ Rooms accessible from here are: ${this.accessibleRoomNames.filter(_.nonEmpty).mk
           this.updateAccessibleRooms()
         this.getLocationInfo
       else
-        s"There is no such room as ${Console.YELLOW}$newRoom${Console.RESET} or you can't access it from here."
+        s"There is no such room as ${textWithColour(newRoom, roomColour)} or you can't access it from here."
     else
       "You need to start the game first"
   }

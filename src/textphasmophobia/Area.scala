@@ -42,13 +42,13 @@ class Area:
     parentRoom ++ children.map(_.value)
   }
 
-  private def getRoomsInVector(current: Node[location]): Vector[location] =
+  private def getRoomsInVector(current: Node[location]): Vector[location] = {
     var childVector: Vector[location] = Vector.empty
     current.children.foreach(child => childVector = childVector ++ this.getRoomsInVector(child))
     current.value +: childVector
+  }
 
-  def getAllRooms: Vector[location] =
-    this.getRoomsInVector(this.rooms.children(0))
+  def getAllRooms: Vector[location] = this.getRoomsInVector(this.rooms.children(0))
 
   private def printTree(current: Node[location], indent: String = ""): Vector[String] = {
     var childStrings: Vector[String] = Vector.empty
