@@ -1,0 +1,4 @@
+Colors for different stuff
+Rooms: Yellow
+Commands: Green
+Ghost: Red
