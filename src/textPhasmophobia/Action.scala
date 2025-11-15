@@ -14,7 +14,6 @@ class Action(input: String, val game: Game):
       case "area" => {
         this.game.area.getMapString + "\nAll rooms: " + this.game.area.getAllRooms.mkString(", ")
       }
-      case "player" => this.game.player.test
       case "ghost" => this.game.getGhost.test
       case other => s"There is no: ${target} to test"
     }
@@ -34,6 +33,7 @@ class Action(input: String, val game: Game):
       case "journal"   => if this.game.isGameRunning then Some(this.game.player.getEvidenceInfo) else Some(this.startReminder)
       case "use"       => if this.game.isGameRunning then Some(this.game.player.use(this.modifiers)) else Some(this.startReminder)
       case "equip"     => if this.game.isGameRunning then Some(this.game.player.equipItem(this.modifiers)) else Some(this.startReminder)
+      case "inspect"   => if this.game.isGameRunning then Some(this.game.player.inspect(this.modifiers)) else Some(this.startReminder)
       case "finish"    => if this.game.isGameRunning then Some(this.game.leaveInvestigation()) else Some(this.startReminder)
       case "quit"      => Some(this.game.player.quit)
       case "test"      => Some(this.test(this.modifiers))

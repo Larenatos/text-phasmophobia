@@ -117,6 +117,13 @@ class Player(val game: Game):
       }
   }
 
+  def inspect(itemName: String): String = {
+    if this.inventory.exists(_.name == "writing book") || this.location.items.exists(_.name == "writing book") then
+      this.game.writingBook.use + "\n" + this.getLocationInfo
+    else
+      s"You don't have any items to inspect. You can only inspect ${this.game.writingBook.toString}"
+  }
+
   def getInventoryText = {
     val text = if this.getInventory.nonEmpty then s"Your inventory contains (${this.inventory.length}/2): ${this.getInventory.mkString(", ")}\n" else "Your inventory is empty (0/2)\n"
     text + this.getLocationInfo
@@ -126,13 +133,6 @@ class Player(val game: Game):
     this.hasQuit = true
     "Player has quit the game"
   }
-
-  def test = {
-    s"""MapLocation: ${this.mapLocation}
-       |Current Room: ${this.location}
-       |Accessible Rooms: ${this.accessibleRoomNames}""".stripMargin
-  }
-
 end Player
 
 

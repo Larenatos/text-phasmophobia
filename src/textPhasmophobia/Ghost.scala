@@ -3,10 +3,10 @@ package textPhasmophobia
 import scala.util.Random
 
 val ghostTypes: Map[String, Vector[String]] = Map.apply(
-  "Mare" -> Vector("spirit box", "ghost orb", "writing"),
-  "Revenant" -> Vector("ghost orb", "writing", "freezing"),
+  "Mare" -> Vector("spirit box", "ghost orb", "ghost writing"),
+  "Revenant" -> Vector("ghost orb", "ghost writing", "freezing"),
   "Onryo" -> Vector("spirit box", "ghost orb", "freezing"),
-  "Moroi" -> Vector("spirit box", "writing", "freezing")
+  "Moroi" -> Vector("spirit box", "ghost writing", "freezing")
 )
 
 class Ghost(val game: Game):

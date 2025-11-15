@@ -1,5 +1,7 @@
 package textPhasmophobia
 
+import scala.util.Random
+
 sealed trait Item(game: Game):
   val name: String
   val evidenceText = s"\nCheck what evidences you have found and what ghost type it could be with ${textWithColour("journal", commandColour)}"
@@ -47,3 +49,21 @@ class SpiritBox(game: Game) extends Item(game):
       "You get no response"
   }
 end SpiritBox
+
+class WritingBook(game: Game) extends Item(game):
+  val name = "writing book"
+  var isWrittenTo = false
+
+  def trigger() = {
+    if !this.isWrittenTo && Random.nextInt(101) < 60 then
+      this.isWrittenTo = true
+  }
+
+  def use: String = {
+    if this.isWrittenTo then
+      this.game.player.addEvidence("ghost writing")
+      s"The ghost has written in this ${textWithColour("book", itemColour)}. This is an evidence for the ghost" + this.evidenceText
+    else
+      s"The ghost has not written on this book"
+  }
+end WritingBook

@@ -21,6 +21,7 @@ class Game:
        |${textWithColour("journal", commandColour)}         - Show what ${textWithColour("evidences", evidenceColour)} you have found and possible ${textWithColour("ghost types", ghostColour)}. It also shows you if you have completed the objective or not
        |${textWithColour("use <item>", commandColour)}      - Uses ${textWithColour("<item>", itemColour)} from players inventory and you will get a result for using that item
        |${textWithColour("equip <item>", commandColour)}    - Equips ${textWithColour("<item>", itemColour)} and after that when ever you go to a room you will use that item and get results. Easy way to find where the ghost is
+       |${textWithColour("inspect <item>", commandColour)}  - Inspects ${textWithColour("<item>", itemColour)} and you get info of that item. You can only inspect ${textWithColour("writing book", itemColour)} to see if the ghost has written to it. This is 1 evidence
        |${textWithColour("finish", commandColour)}          - Finish an investigation if you are in the truck and you have started an investigation
        |${textWithColour("quit", commandColour)}            - Quit the whole game program
        |
@@ -35,13 +36,16 @@ class Game:
        |To learn more about evidence and items enter the command ${textWithColour("learn evidence", commandColour)}
        |
        |Here is a small example of commands that you can run to start finding the ghost room
-       |${textWithColour("start", commandColour)}            | start investigation
-       |${textWithColour("unlock house", commandColour)}     | opens the locked door to the house
-       |${textWithColour("take thermometer", commandColour)} | picks up ${textWithColour("thermometer", itemColour)} from the truck
-       |                                                     | You can also take another item because you have 2 inventory slots
+       |${textWithColour("start", commandColour)}                | start investigation
+       |${textWithColour("unlock house", commandColour)}         | opens the locked door to the house
+       |${textWithColour("take thermometer", commandColour)}     | picks up ${textWithColour("thermometer", itemColour)} from the truck
+       |                                                         | You can also take another item because you have 2 inventory slots
+       |${textWithColour("take writing book", commandColour)}
        |${textWithColour("equip thermometer", commandColour)}
-       |${textWithColour("go foyer", commandColour)}         | Goes to ${textWithColour("foyer", roomColour)} and prints out the ${textWithColour("temperature", temperatureColour)} in that room you went to. Visit rooms like this until you find the ghost room
-       |                                                     | Track which rooms you have already been to and go to other ones. You are looking for a room with temperature below ${textWithColour("15 celsius", temperatureColour)}""".stripMargin
+       |${textWithColour("go foyer", commandColour)}             | Goes to ${textWithColour("foyer", roomColour)} and prints out the ${textWithColour("temperature", temperatureColour)} in that room you went to. Visit rooms like this until you find the ghost room
+       |                                                         | Track which rooms you have already been to and go to other ones. You are looking for a room with temperature below ${textWithColour("15 celsius", temperatureColour)}
+       |${textWithColour("drop writing book", commandColour)}    | Places writing book in this room and if the ghost is here it has a chance to write to it on every turn
+       |${textWithColour("inspect writing book", commandColour)} | See if the ghost has written on the book""".stripMargin
 
   val learnGhostText =
     s"""There are ${ghostTypes.keys.toVector.length} ghost types currently: ${ghostTypes.keys.map(textWithColour(_, ghostColour)).mkString(", ")}
@@ -74,6 +78,12 @@ class Game:
   var player = Player(this)
   private var ghost: Ghost = Ghost(this)
 
+  // items for the investigation
+  var thermometer = Thermometer(this)
+  var spiritBox = SpiritBox(this)
+  var videoCamera = VideoCamera(this)
+  var writingBook = WritingBook(this)
+
   def getGhost: Ghost = this.ghost
 
   def isOver = this.player.hasQuit
@@ -82,15 +92,23 @@ class Game:
 
   def turnsSinceHouseUnlock = this.turnCount - this.unlockHouseTurn
 
+  def resetVariables() = {
+    this.isGameRunning = true
+    this.area = Area(this)
+    this.ghost = Ghost(this)
+    this.player = Player(this)
+    this.isObjectiveCompleted = false
+    this.thermometer = Thermometer(this)
+    this.spiritBox = SpiritBox(this)
+    this.videoCamera = VideoCamera(this)
+    this.writingBook = WritingBook(this)
+  }
+
   def start() = {
     if this.isGameRunning then
       "You are already in an investigation"
     else
-      this.isGameRunning = true
-      this.ghost = Ghost(this)
-      this.area = Area(this)
-      this.player = Player(this)
-      this.isObjectiveCompleted = false
+      this.resetVariables()
       s"""You are now in ${textWithColour("truck", roomColour)} outside Tanglewood Drive 6.
          |The house is haunted by a ghost.
          |Your goal is to visit the ghost room and leave.
@@ -128,10 +146,17 @@ class Game:
       this.area.getAllRooms.foreach(_.updateTemperature())
   }
 
+  def updateWritingBook() = {
+    if this.getGhost.favRoom.items.exists(_.name == "writing book") then {
+      this.writingBook.trigger()
+    }
+  }
+
   def playTurn(command: String): String = {
     val outcomeReport = Action(command, this).execute()
     if outcomeReport.isDefined && this.isGameRunning && Vector("test", "learn", "tutorial", "help").forall(text => !(command contains text)) then
       this.updateRoomTemps()
+      this.updateWritingBook()
       this.turnCount += 1
     outcomeReport.getOrElse(s"""Unknown command: "$command".""")
   }

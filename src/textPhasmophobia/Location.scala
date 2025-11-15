@@ -31,7 +31,7 @@ end Location
 
 class Truck(game: Game) extends Location(game):
   val name = "truck"
-  var items: Vector[Item] = Vector(Thermometer(game), VideoCamera(game), SpiritBox(game))
+  var items: Vector[Item] = Vector(game.thermometer, game.spiritBox, game.videoCamera, game.writingBook)
   var temperature = 15
 
   def updateTemperature() = {
@@ -55,8 +55,8 @@ class Room(val name: String, game: Game) extends Location(game):
       // ghost room
       if this.game.getGhost.evidence contains "freezing" then
         // ghost has freezing as evidence
-        if this.temperature > 3 || (isNegative && this.temperature > -15) then
-          this.changeTemp(-2.toFloat * Random.nextFloat() - 1)
+        if this.temperature > 2 || (isNegative && this.temperature > -15) then
+          this.changeTemp(-2.toFloat * Random.nextFloat() - 2)
         else
           this.changeTemp(2.toFloat * Random.nextFloat() + 1)
       else
