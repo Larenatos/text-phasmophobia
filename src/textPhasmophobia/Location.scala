@@ -2,7 +2,7 @@ package textPhasmophobia
 
 import scala.util.Random
 
-sealed trait location(game: Game):
+sealed trait Location(game: Game):
   val name: String
   var items: Vector[Item]
   var temperature: Double
@@ -27,11 +27,11 @@ sealed trait location(game: Game):
   }
 
   override def toString: String = textWithColour(this.name, roomColour)
-end location
+end Location
 
-class Truck(game: Game) extends location(game):
+class Truck(game: Game) extends Location(game):
   val name = "truck"
-  var items: Vector[Item] = Vector(Thermometer(game))
+  var items: Vector[Item] = Vector(Thermometer(game), VideoCamera(game), SpiritBox(game))
   var temperature = 15
 
   def updateTemperature() = {
@@ -39,7 +39,7 @@ class Truck(game: Game) extends location(game):
   }
 end Truck
 
-class Room(val name: String, game: Game) extends location(game):
+class Room(val name: String, game: Game) extends Location(game):
   var items: Vector[Item] = Vector.empty
   var temperature: Double = roundToDecimals(Random.nextFloat * 3 + 19, 1)
 
@@ -50,20 +50,22 @@ class Room(val name: String, game: Game) extends location(game):
   def updateTemperature() = {
     val isNegative = Random.nextBoolean()
 
+
     if this.game.getGhost.favRoom.name == this.name then
+      println(this.name)
       // ghost room
       if this.game.getGhost.evidence contains "freezing" then
         // ghost has freezing as evidence
         if this.temperature > 3 || (isNegative && this.temperature > -15) then
-          this.changeTemp(-4.toFloat * Random.nextFloat() + 3)
+          this.changeTemp(-2.toFloat * Random.nextFloat() - 1)
         else
-          this.changeTemp(5.toFloat * Random.nextFloat() + 2)
+          this.changeTemp(2.toFloat * Random.nextFloat() + 1)
       else
         // no freezing evidence
         if this.temperature > 8 || (isNegative && this.temperature > 2) then
-          this.changeTemp(-4.toFloat * Random.nextFloat() + 1)
+          this.changeTemp(-2.toFloat * Random.nextFloat() + 1)
         else
-          this.changeTemp(4.toFloat * Random.nextFloat())
+          this.changeTemp(2.toFloat * Random.nextFloat() + 1)
         if this.temperature < 1 then
           this.temperature = 1
     else

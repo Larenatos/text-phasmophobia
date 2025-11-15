@@ -3,7 +3,7 @@ package textPhasmophobia
 class Game:
   val welcomeMessage =
     s"""\nThis is phasmophobia in text form. The game has you enter a haunted hause and your task is to find out what type of ghost it is.
-       |You can always type ${textWithColour("help", evidenceColour)} the get list of all the commands you can use and their description. Try it out!
+       |You can always type ${textWithColour("help", commandColour)} the get list of all the commands you can use and their description. Try it out!
        |Enter command ${textWithColour("tutorial", commandColour)} to get a brief introduction to how the game works and what you need to do in order to succeed in an investigation
        |To start playing you need to start an investigation.
        |You can do that by entering the command: ${textWithColour("start", commandColour)}""".stripMargin
@@ -16,16 +16,21 @@ class Game:
        |${textWithColour("unlock <target>", commandColour)} - Usually ${textWithColour("unlock", commandColour)} ${textWithColour("house", roomColour)}. This is used to actually start the investigation into the house
        |${textWithColour("go <name>", commandColour)}       - More to room <name> if it exists and is accessible from where you are now
        |${textWithColour("take", commandColour)}            - Will take an item from this room if it is here and put it into your inventory
+       |${textWithColour("drop", commandColour)}            - Place an item in your current location
        |${textWithColour("inventory", commandColour)}       - Show all the items in your inventory at this time
+       |${textWithColour("journal", commandColour)}         - Show what ${textWithColour("evidences", evidenceColour)} you have found and possible ${textWithColour("ghost types", ghostColour)}. It also shows you if you have completed the objective or not
        |${textWithColour("use <item>", commandColour)}      - Uses ${textWithColour("<item>", itemColour)} from players inventory and you will get a result for using that item
        |${textWithColour("finish", commandColour)}          - Finish an investigation if you are in the truck and you have started an investigation
-       |${textWithColour("quit", commandColour)}            - Quit the whole game program""".stripMargin
+       |${textWithColour("quit", commandColour)}            - Quit the whole game program
+       |
+       |Here is a list of colours you will see: ${textWithColour("command", commandColour)}, ${textWithColour("room", roomColour)}, ${textWithColour("ghost", ghostColour)}, ${textWithColour("item", itemColour)}, ${textWithColour("temperature", temperatureColour)}, ${textWithColour("evidence", evidenceColour)}""".stripMargin
   val tutorialText =
     s"""An investigation starts with you the player arriving to a haunted house in a truck. You are given a key to they house and use that to unlock the house by entering command ${textWithColour("unlock house", commandColour)}
        |Once the house is unlocked the temperatures will start to fluctuate inside the house. It is important because every room starts at the same temperature but in the ghost room temps start to drop
        |So using a thermometer is recommended to find the ghost room. It is also used to find out if the ghost has ${textWithColour("freezing", evidenceColour)} as evidence
        |There are currently 4 ghost types and they each have 3 specific evidences that you need to test for in order to know which ghost it is. Get more info on that by typing the command ${textWithColour("learn ghost", commandColour)}
        |You can pick up items with ${textWithColour("take", commandColour)} ${textWithColour("<item>", itemColour)} and once you have it in your inventory you can type ${textWithColour("use", commandColour)} ${textWithColour("<item>", itemColour)} to get results for using that item
+       |You get notified if you find ${textWithColour("evidence", evidenceColour)} while using an item and they will be marked in your journal. Journal contains your found ${textWithColour("evidence", evidenceColour)} and what ${textWithColour("ghost types", ghostColour)} it could be. You can view your journal with ${textWithColour("journal", commandColour)}
        |To learn more about evidence and items enter the command ${textWithColour("learn evidence", commandColour)}
        |""".stripMargin
   val learnGhostText =
@@ -53,9 +58,10 @@ class Game:
   var isObjectiveDone = false
   var isGameRunning = false
   var isHouseUnlocked = false
+  var isObjectiveCompleted = false
 
   var area = Area(this)
-  val player = Player(this)
+  var player = Player(this)
   private var ghost: Ghost = Ghost(this)
 
   def getGhost: Ghost = this.ghost
@@ -73,6 +79,8 @@ class Game:
       this.isGameRunning = true
       this.ghost = Ghost(this)
       this.area = Area(this)
+      this.player = Player(this)
+      this.isObjectiveCompleted = false
       s"""You are now in ${textWithColour("truck", roomColour)} outside Tanglewood Drive 6.
          |The house is haunted by a ghost.
          |Your goal is to visit the ghost room and leave.
@@ -90,19 +98,18 @@ class Game:
   }
 
   def leaveInvestigation(): String = {
-    if this.isGameRunning then
-      if this.player.location.name == "truck" then
-        val report =
-          s"""You finished an investigation. Your investigation lasted for ${this.turnCount} turns
-             |The ghost was ${this.ghost} and it's favourite room was ${this.ghost.favRoom}
-             |You can start a new investigation by entering the ${textWithColour("start", commandColour)} again!""".stripMargin
-        this.turnCount = 0
-        this.isGameRunning = false
-        report
-      else
-        "You need to be in the truck to be able to leave"
+    if this.player.location.name == "truck" then
+      val objectiveText = if this.isObjectiveCompleted then "You completed the objective. Good job!" else "You did not complete the objective"
+      val report =
+        s"""${objectiveText}
+           |Your investigation lasted for ${this.turnCount} turns
+           |The ghost was ${this.ghost} and it's favourite room was ${this.ghost.favRoom}
+           |You can start a new investigation by entering the ${textWithColour("start", commandColour)} again!""".stripMargin
+      this.turnCount = 0
+      this.isGameRunning = false
+      report
     else
-      "You need to have started the investigation first"
+      "You need to be in the truck to be able to leave"
   }
 
   def updateRoomTemps() = {

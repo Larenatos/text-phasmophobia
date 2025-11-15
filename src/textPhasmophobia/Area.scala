@@ -3,7 +3,7 @@ package textPhasmophobia
 case class Node[location](value: location, children: Vector[Node[location]])
 
 class Area(val game: Game):
-  val rooms: Node[location] =
+  val rooms: Node[Location] =
     Node(Truck(this.game), Vector(
       Node(Room("foyer", this.game), Vector(
         Node(Room("boy bedroom", this.game), Vector.empty),
@@ -13,7 +13,7 @@ class Area(val game: Game):
           Node(Room("master bedroom", this.game), Vector.empty),
           Node(Room("basement", this.game), Vector.empty),
           Node(Room("utility", this.game), Vector(
-            Node(Room("Garage", this.game), Vector.empty)
+            Node(Room("garage", this.game), Vector.empty)
           )),
           Node(Room("kitchen", this.game), Vector(
             Node(Room("dining room", this.game), Vector.empty)
@@ -32,8 +32,8 @@ class Area(val game: Game):
     roomNode
   }
 
-  def getAccessibleRooms(location: String): Vector[location] = {
-    val parentRoom: Vector[location] = if location.nonEmpty then
+  def getAccessibleRooms(location: String): Vector[Location] = {
+    val parentRoom: Vector[Location] = if location.nonEmpty then
       Vector(this.getRoom(location.dropRight(1)).value)
     else
       Vector.empty
@@ -42,15 +42,15 @@ class Area(val game: Game):
     parentRoom ++ children.map(_.value)
   }
 
-  private def getRoomsInVector(current: Node[location]): Vector[location] = {
-    var childVector: Vector[location] = Vector.empty
+  private def getRoomsInVector(current: Node[Location]): Vector[Location] = {
+    var childVector: Vector[Location] = Vector.empty
     current.children.foreach(child => childVector = childVector ++ this.getRoomsInVector(child))
     current.value +: childVector
   }
 
-  def getAllRooms: Vector[location] = this.getRoomsInVector(this.rooms.children(0))
+  def getAllRooms: Vector[Location] = this.getRoomsInVector(this.rooms.children(0))
 
-  private def printTree(current: Node[location], indent: String = ""): Vector[String] = {
+  private def printTree(current: Node[Location], indent: String = ""): Vector[String] = {
     var childStrings: Vector[String] = Vector.empty
     current.children.foreach(child => {
       childStrings = childStrings ++ this.printTree(child, indent + "  ")
