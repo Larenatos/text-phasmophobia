@@ -9,6 +9,7 @@ class Player(val game: Game):
   private var inventory: Vector[Item] = Vector.empty
   private var currentLocation: Location = this.game.area.getRoom(this.mapLocation).value
   private var evidences: Vector[String] = Vector.empty
+  private var equippedItem: Option[Item] = None
 
   def location = currentLocation
 
@@ -30,6 +31,17 @@ class Player(val game: Game):
       this.evidences = this.evidences :+ evidence
   }
 
+  def equipItem(itemName: String): String = {
+    if this.inventory.exists(_.name == itemName) && (Vector("thermometer", "video camera", "spirit box") contains itemName) then
+      val item = this.inventory.filter(_.name == itemName)(0)
+      this.equippedItem = Some(item)
+      s"""You have now equipped ${textWithColour(itemName, itemColour)}. When you enter a room you will get info from this item.
+         |${this.getLocationInfo}""".stripMargin
+    else
+      s"""${textWithColour(itemName, itemColour)} is not equippaple or you don't have that item in your inventory
+         |${this.getLocationInfo}""".stripMargin
+  }
+
   def getEvidenceInfo: String = {
     if this.evidences.isEmpty then
       s"""You not found any evidence yet. The ghost could be anything
@@ -47,25 +59,24 @@ class Player(val game: Game):
 
   def go(newRoom: String) = {
     val roomNames = this.accessibleRooms.map(_.name)
-    if game.isGameRunning then
-      if this.game.isHouseUnlocked then
-        if (roomNames contains newRoom) && newRoom.nonEmpty then
-          val roomIndex = roomNames.indexOf(newRoom)
-          if roomIndex == 0 && this.location.name != "truck" then
-            this.mapLocation = this.mapLocation.dropRight(1)
-            this.updateRoomData()
-          else
-            this.mapLocation = if roomNames.length > 1 then this.mapLocation + (roomIndex - 1).toString else this.mapLocation + roomIndex.toString
-            this.updateRoomData()
-          this.getLocationInfo
+
+    if this.game.isHouseUnlocked then
+      if (roomNames contains newRoom) && newRoom.nonEmpty then
+        val roomIndex = roomNames.indexOf(newRoom)
+        if roomIndex == 0 && this.location.name != "truck" then
+          this.mapLocation = this.mapLocation.dropRight(1)
+          this.updateRoomData()
         else
-          s"""There is no such room as ${textWithColour(newRoom, roomColour)} or you can't access it from here.
-             |${this.getLocationInfo}""".stripMargin
+          this.mapLocation = if roomNames.length > 1 then this.mapLocation + (roomIndex - 1).toString else this.mapLocation + roomIndex.toString
+          this.updateRoomData()
+
+        this.equippedItem.fold(this.getLocationInfo)(item => s"Your equipped item tells you: ${item.use}\n" + this.getLocationInfo)
       else
-        s"""You need to unlock the house first. You can do that by entering ${textWithColour("unlock", commandColour)} ${textWithColour("house", roomColour)}
+        s"""There is no such room as ${textWithColour(newRoom, roomColour)} or you can't access it from here.
            |${this.getLocationInfo}""".stripMargin
     else
-      "You need to start an investigation first"
+      s"""You need to unlock the house first. You can do that by entering ${textWithColour("unlock", commandColour)} ${textWithColour("house", roomColour)}
+         |${this.getLocationInfo}""".stripMargin
   }
 
   def isInGhostRoom: Boolean =

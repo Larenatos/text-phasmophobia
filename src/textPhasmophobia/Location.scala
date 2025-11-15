@@ -52,7 +52,6 @@ class Room(val name: String, game: Game) extends Location(game):
 
 
     if this.game.getGhost.favRoom.name == this.name then
-      println(this.name)
       // ghost room
       if this.game.getGhost.evidence contains "freezing" then
         // ghost has freezing as evidence
@@ -63,7 +62,7 @@ class Room(val name: String, game: Game) extends Location(game):
       else
         // no freezing evidence
         if this.temperature > 8 || (isNegative && this.temperature > 2) then
-          this.changeTemp(-2.toFloat * Random.nextFloat() + 1)
+          this.changeTemp(-2.toFloat * Random.nextFloat() - 1)
         else
           this.changeTemp(2.toFloat * Random.nextFloat() + 1)
         if this.temperature < 1 then

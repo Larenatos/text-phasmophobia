@@ -33,6 +33,7 @@ class Action(input: String, val game: Game):
       case "inventory" => if this.game.isGameRunning then Some(this.game.player.getInventoryText) else Some(this.startReminder)
       case "journal"   => if this.game.isGameRunning then Some(this.game.player.getEvidenceInfo) else Some(this.startReminder)
       case "use"       => if this.game.isGameRunning then Some(this.game.player.use(this.modifiers)) else Some(this.startReminder)
+      case "equip"     => if this.game.isGameRunning then Some(this.game.player.equipItem(this.modifiers)) else Some(this.startReminder)
       case "finish"    => if this.game.isGameRunning then Some(this.game.leaveInvestigation()) else Some(this.startReminder)
       case "quit"      => Some(this.game.player.quit)
       case "test"      => Some(this.test(this.modifiers))
