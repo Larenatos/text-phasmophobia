@@ -2,10 +2,10 @@ package textphasmophobia
 
 import scala.util.Random
 
-private val ghostTypes: Map[String, Vector[String]] = Map.apply(
-  "Mare" -> Vector("spirit box", "ghost orbs", "writing"),
-  "Revenant" -> Vector("Ghost orbs", "writing", "freezing"),
-  "Onryo" -> Vector("spirit box", "ghost orbs", "freezing"),
+val ghostTypes: Map[String, Vector[String]] = Map.apply(
+  "Mare" -> Vector("spirit box", "ghost orb", "writing"),
+  "Revenant" -> Vector("Ghost orb", "writing", "freezing"),
+  "Onryo" -> Vector("spirit box", "ghost orb", "freezing"),
   "Moroi" -> Vector("spirit box", "writing", "freezing")
 )
 

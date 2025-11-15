@@ -51,11 +51,23 @@ class Room(val name: String, game: Game) extends location(game):
     val isNegative = Random.nextBoolean()
 
     if this.game.getGhost.favRoom.name == this.name then
-      if this.temperature > 7 || (isNegative && (((this.game.getGhost.evidence contains "freezing") && this.temperature > -15) || this.temperature < 3)) then
-        this.changeTemp(-3.toFloat * Random.nextFloat())
+      // ghost room
+      if this.game.getGhost.evidence contains "freezing" then
+        // ghost has freezing as evidence
+        if this.temperature > 3 || (isNegative && this.temperature > -15) then
+          this.changeTemp(-4.toFloat * Random.nextFloat() + 3)
+        else
+          this.changeTemp(5.toFloat * Random.nextFloat() + 2)
       else
-        this.changeTemp(3.toFloat * Random.nextFloat())
+        // no freezing evidence
+        if this.temperature > 8 || (isNegative && this.temperature > 2) then
+          this.changeTemp(-4.toFloat * Random.nextFloat() + 1)
+        else
+          this.changeTemp(4.toFloat * Random.nextFloat())
+        if this.temperature < 1 then
+          this.temperature = 1
     else
+      // not ghost room
       if this.temperature > 22.0 || (isNegative && this.temperature > 18) then
         this.changeTemp(-1.5.toFloat * Random.nextFloat())
       else

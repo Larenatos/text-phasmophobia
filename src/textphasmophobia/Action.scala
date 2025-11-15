@@ -23,6 +23,8 @@ class Action(input: String, val game: Game):
   def execute(): Option[String] = {
     this.verb match
       case "help"      => Some(this.game.helpText)
+      case "tutorial"  => Some(this.game.tutorialText)
+      case "learn"     => Some(this.game.getLearnText(this.modifiers))
       case "start"     => Some(this.game.start())
       case "unlock"    => if this.game.isGameRunning then Some(this.game.unlock(this.modifiers)) else Some(this.startReminder)
       case "go"        => if this.game.isGameRunning then Some(this.game.player.go(this.modifiers)) else Some(this.startReminder)
