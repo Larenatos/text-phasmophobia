@@ -22,22 +22,25 @@ class Player(val game: Game):
   def getLocationInfo =
     s"""You are now in ${this.location.toString}.
        |Rooms accessible from here are: ${this.accessibleRoomNames.mkString(", ")}
-       |This room has: ${if this.location.items.nonEmpty then this.location.items.map(_.toString).mkString(", ") else "no items"}""".stripMargin
+       |This room has ${if this.location.items.nonEmpty then this.location.items.map(_.toString).mkString(", ") else "no items"}""".stripMargin
 
   def go(newRoom: String) = {
     val roomNames = this.accessibleRooms.map(_.name)
     if game.isGameRunning then
-      if (roomNames contains newRoom) && newRoom.nonEmpty then
-        val roomIndex = roomNames.indexOf(newRoom)
-        if roomIndex == 0 && this.location.name != "truck" then
-          this.mapLocation = this.mapLocation.dropRight(1)
-          this.updateRoomData()
+      if this.game.isHouseUnlocked then
+        if (roomNames contains newRoom) && newRoom.nonEmpty then
+          val roomIndex = roomNames.indexOf(newRoom)
+          if roomIndex == 0 && this.location.name != "truck" then
+            this.mapLocation = this.mapLocation.dropRight(1)
+            this.updateRoomData()
+          else
+            this.mapLocation = if roomNames.length > 1 then this.mapLocation + (roomIndex - 1).toString else this.mapLocation + roomIndex.toString
+            this.updateRoomData()
+          this.getLocationInfo
         else
-          this.mapLocation = if roomNames.length > 1 then this.mapLocation + (roomIndex - 1).toString else this.mapLocation + roomIndex.toString
-          this.updateRoomData()
-        this.getLocationInfo
+          s"There is no such room as ${textWithColour(newRoom, roomColour)} or you can't access it from here."
       else
-        s"There is no such room as ${textWithColour(newRoom, roomColour)} or you can't access it from here."
+        s"You need to unlock the house first. You can do that by entering ${textWithColour("unlock", commandColour)} ${textWithColour("house", roomColour)}"
     else
       "You need to start the game first"
   }

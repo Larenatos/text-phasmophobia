@@ -1,8 +1,13 @@
 package textphasmophobia
 
-sealed trait location:
+import scala.util.Random
+
+sealed trait location(game: Game):
   val name: String
   var items: Vector[Item]
+  var temperature: Double
+
+  def updateTemperature(): Unit
 
   def takeItem(itemName: String): Item = {
     this.items.find(_.name == itemName) match {
@@ -24,11 +29,36 @@ sealed trait location:
   override def toString: String = textWithColour(this.name, roomColour)
 end location
 
-class Truck(game: Game) extends location:
+class Truck(game: Game) extends location(game):
   val name = "truck"
   var items: Vector[Item] = Vector(Thermometer(game))
+  var temperature = 15
+
+  def updateTemperature() = {
+    this.temperature = 15
+  }
 end Truck
 
-class Room(val name: String) extends location:
+class Room(val name: String, game: Game) extends location(game):
   var items: Vector[Item] = Vector.empty
+  var temperature: Double = roundToDecimals(Random.nextFloat * 3 + 19, 1)
+
+  private def changeTemp(addition: Float) = {
+    this.temperature = roundToDecimals(this.temperature.toFloat + addition, 1)
+  }
+
+  def updateTemperature() = {
+    val isNegative = Random.nextBoolean()
+
+    if this.game.getGhost.favRoom.name == this.name then
+      if this.temperature > 7 || (isNegative && (((this.game.getGhost.evidence contains "freezing") && this.temperature > -15) || this.temperature < 3)) then
+        this.changeTemp(-3.toFloat * Random.nextFloat())
+      else
+        this.changeTemp(3.toFloat * Random.nextFloat())
+    else
+      if this.temperature > 22.0 || (isNegative && this.temperature > 18) then
+        this.changeTemp(-1.5.toFloat * Random.nextFloat())
+      else
+        this.changeTemp(1.5.toFloat * Random.nextFloat())
+  }
 end Room
