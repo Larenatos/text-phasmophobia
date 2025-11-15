@@ -1,4 +1,4 @@
-package textphasmophobia
+package textPhasmophobia
 
 case class Node[location](value: location, children: Vector[Node[location]])
 

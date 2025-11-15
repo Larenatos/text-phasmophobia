@@ -1,4 +1,4 @@
-package textphasmophobia
+package textPhasmophobia
 
 
 sealed trait Item(game: Game):

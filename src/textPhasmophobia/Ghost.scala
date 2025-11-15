@@ -1,4 +1,4 @@
-package textphasmophobia
+package textPhasmophobia
 
 import scala.util.Random
 

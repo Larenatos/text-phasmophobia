@@ -1,4 +1,4 @@
-package textphasmophobia
+package textPhasmophobia
 
 import scala.collection.mutable.Map
 

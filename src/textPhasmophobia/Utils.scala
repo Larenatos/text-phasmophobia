@@ -1,4 +1,4 @@
-package textphasmophobia
+package textPhasmophobia
 
 def textWithColour(text: String, color: String): String = color + text + Console.RESET
 

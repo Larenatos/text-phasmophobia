@@ -1,9 +1,10 @@
-package textphasmophobia
+package textPhasmophobia.ui
+
+import textPhasmophobia.*
 
 import scala.io.StdIn.*
-import textphasmophobia.*
 
-object TextPhasmophobiaTextUI extends App:
+object TextUI extends App:
   val game = Game()
 
   this.run()
@@ -22,4 +23,4 @@ object TextPhasmophobiaTextUI extends App:
       println("-------------------------------------------------------------")
       println(turnReport)
 
-end TextPhasmophobiaTextUI
+end TextUI

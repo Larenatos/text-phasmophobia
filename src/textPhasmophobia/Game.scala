@@ -1,4 +1,4 @@
-package textphasmophobia
+package textPhasmophobia
 
 class Game:
   val welcomeMessage =

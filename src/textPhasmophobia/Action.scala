@@ -1,4 +1,4 @@
-package textphasmophobia
+package textPhasmophobia
 
 class Action(input: String, val game: Game):
   private val commandText = input.trim.toLowerCase
