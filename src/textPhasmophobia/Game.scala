@@ -5,8 +5,9 @@ class Game:
     s"""\nThis is phasmophobia in text form. The game has you enter a haunted hause and your task is to find out what type of ghost it is.
        |You can always type ${textWithColour("help", commandColour)} the get list of all the commands you can use and their description. Try it out!
        |Enter command ${textWithColour("tutorial", commandColour)} to get a brief introduction on how the game works and what you need to do in order to succeed in an investigation
-       |To start playing you need to start an investigation.
-       |You can do that by entering the command: ${textWithColour("start", commandColour)}""".stripMargin
+       |${textWithColour("Please read tutorial before playing", importantColour)}
+       |
+       |Start an investigation with command: ${textWithColour("start", commandColour)}""".stripMargin
   val helpText =
     s"""Here is a list of ${textWithColour("commands", commandColour)} you can use
        |${textWithColour("help", commandColour)}            - Print this message
@@ -27,7 +28,9 @@ class Game:
        |
        |Here is a list of the colours you will see and what they mean: ${textWithColour("command", commandColour)}, ${textWithColour("room", roomColour)}, ${textWithColour("ghost", ghostColour)}, ${textWithColour("item", itemColour)}, ${textWithColour("temperature", temperatureColour)}, ${textWithColour("evidence", evidenceColour)}""".stripMargin
   val tutorialText =
-    s"""An investigation starts with you the player arriving to a haunted house in a truck. You are given a key to they house and use that to unlock the house with ${textWithColour("unlock house", commandColour)}.
+    s"""${this.helpText}
+       |
+       |An investigation starts with you the player arriving to a haunted house in a truck. You are given a key to they house and use that to unlock the house with ${textWithColour("unlock house", commandColour)}.
        |Once the house is unlocked the temperatures will start to fluctuate inside. It is important because every room starts at the same temperature but in the ghost room the temperature starts to drop.
        |It is recommended to use a thermometer to find the ghost room. It is also used to find out if the ghost has ${textWithColour("freezing", evidenceColour)} as evidence.
        |There are currently 4 ghost types and they each have 3 specific evidences that you need to test for in order to know which ghost it is. Get more info on that by typing the command ${textWithColour("learn ghost", commandColour)}
@@ -46,7 +49,6 @@ class Game:
        |${textWithColour("drop writing book", commandColour)}    - When you find the ghost room, place writing book there and the ghost has chance to write to it on every turn if it is one of the evidences for that ghost
        |${textWithColour("inspect writing book", commandColour)} - See if the ghost has written on the book
        |You will need to go and take more items from the truck to find all 3 evidences. You can leave the currents items in the ghost room with ${textWithColour("drop <item>", commandColour)}""".stripMargin
-
   val learnGhostText =
     s"""There are ${ghostTypes.keys.toVector.length} ghost types currently: ${ghostTypes.keys.map(textWithColour(_, ghostColour)).mkString(", ")}
        |Each of them have different evidences that you need to test for. Find out more about each evidence with ${textWithColour("learn evidence", commandColour)}
@@ -118,7 +120,7 @@ class Game:
       this.resetVariables()
       s"""You are now in ${textWithColour("truck", roomColour)} outside Tanglewood Drive 6.
          |The house is haunted by a ghost.
-         |Your goal is to visit the ghost room and leave.
+         |Your goal is to find out the ghost type and leave.
          |You can move to a different room by typing ${textWithColour("go",commandColour)} ${textWithColour("<room name>", roomColour)}
          |${this.player.getLocationInfo.dropWhile(_ != '.').drop(3)}""".stripMargin
   }

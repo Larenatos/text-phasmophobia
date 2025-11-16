@@ -58,7 +58,7 @@ class Player(val game: Game):
       val ghostType = ghostTypes.filter((name, evidence) => this.evidences.forall(evidence contains _)).keys.toVector(0)
       this.game.completeObjective()
       s"""Evidence you have found: ${this.evidences.map(textWithColour(_, evidenceColour)).mkString(", ")} and the ghost is ${textWithColour(ghostType, ghostColour)}
-         |You can now finish investigation from the truck with ${textWithColour("finish", commandColour)}
+         |You can now finish investigation from ${textWithColour("truck", roomColour)} with ${textWithColour("finish", commandColour)}
          |${this.getLocationInfo}""".stripMargin
     else
       s"""Evidence you have found: ${this.evidences.map(textWithColour(_, evidenceColour)).mkString(", ")}. The ghost could be ${ghostTypes.filter((name, evidence) => this.evidences.forall(evidence contains _)).keys.map(textWithColour(_, ghostColour)).mkString(", ")}
@@ -92,10 +92,14 @@ class Player(val game: Game):
 
   def take(itemName: String): String = {
     if this.location.hasItem(itemName) then
-      val item = this.location.takeItem(itemName)
-      this.inventory = this.inventory :+ item
-      s"""You picked up $item
-         |${this.getLocationInfo}""".stripMargin
+      if this.inventory.length < 2 then
+        val item = this.location.takeItem(itemName)
+        this.inventory = this.inventory :+ item
+        s"""You picked up $item
+           |${this.getLocationInfo}""".stripMargin
+      else
+        s"""Your inventory is full
+           |${this.getLocationInfo}""".stripMargin
     else
       s"""Item ${textWithColour(itemName, itemColour)} is not here. Did you type the item correctly?
          |${this.getLocationInfo}""".stripMargin

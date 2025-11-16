@@ -9,6 +9,7 @@ val roomColour = Console.YELLOW
 val itemColour = Console.MAGENTA
 val temperatureColour = Console.BLUE
 val evidenceColour = "\u001b[38;2;236;114;16m"
+val importantColour = Console.CYAN
 
 def roundToDecimals(value: Float, decimals: Int) =
   1.0 * Math.round(Math.pow(10, decimals) * value) / Math.pow(10, decimals)
