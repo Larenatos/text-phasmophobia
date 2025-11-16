@@ -12,9 +12,9 @@ class Action(input: String, val game: Game):
   private def test(target: String): String = {
     target.toLowerCase() match {
       case "area" => {
-        this.game.area.getMapString + "\nAll rooms: " + this.game.area.getAllRooms.mkString(", ")
+        this.game.area.getMapString + "\nAll rooms: " + this.game.area.getAllRoomsExceptTruck.mkString(", ")
       }
-      case "ghost" => this.game.getGhost.test
+      case "ghost" => this.game.ghost.test
       case other => s"There is no: ${target} to test"
     }
   }
@@ -39,8 +39,6 @@ class Action(input: String, val game: Game):
       case "test"      => Some(this.test(this.modifiers))
       case other       => None
   }
-
-  override def toString = s"$verb (modifiers: $modifiers)"
 end Action
 
 

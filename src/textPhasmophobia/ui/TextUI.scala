@@ -20,7 +20,7 @@ object TextUI extends App:
     val command = readLine("Command: ")
     val turnReport = this.game.playTurn(command)
     if turnReport.nonEmpty then
-      println("-------------------------------------------------------------")
+      println("-" * 40)
       println(turnReport)
   }
 

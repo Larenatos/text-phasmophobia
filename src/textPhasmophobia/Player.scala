@@ -3,13 +3,21 @@ package textPhasmophobia
 import scala.collection.mutable.Map
 
 class Player(val game: Game):
-  var hasQuit = false
-  private var mapLocation = "" // Empty string means the player is in truck
+  private var mapLocation = ""
   private var accessibleRooms = this.game.area.getAccessibleRooms(this.mapLocation)
   private var inventory: Vector[Item] = Vector.empty
   private var currentLocation: Location = this.game.area.getRoom(this.mapLocation).value
   private var evidences: Vector[String] = Vector.empty
   private var equippedItem: Option[Item] = None
+
+  def reset() = {
+    this.mapLocation = ""
+    this.accessibleRooms = this.game.area.getAccessibleRooms(this.mapLocation)
+    this.inventory = Vector.empty
+    this.currentLocation = this.game.area.getRoom(this.mapLocation).value
+    this.evidences = Vector.empty
+    this.equippedItem = None
+  }
 
   def location = currentLocation
 
@@ -24,7 +32,7 @@ class Player(val game: Game):
   def getLocationInfo =
     s"""You are now in ${this.location.toString}.
        |Rooms accessible from here are: ${this.accessibleRoomNames.mkString(", ")}
-       |This room has ${if this.location.items.nonEmpty then this.location.items.map(_.toString).mkString(", ") else "no items"}""".stripMargin
+       |This room has ${if this.location.getItems.nonEmpty then this.location.getItems.map(_.toString).mkString(", ") else "no items"}""".stripMargin
 
   def addEvidence(evidence: String) = {
     if !(this.evidences contains evidence) then
@@ -48,7 +56,7 @@ class Player(val game: Game):
          |${this.getLocationInfo}""".stripMargin
     else if this.evidences.length == 3 then
       val ghostType = ghostTypes.filter((name, evidence) => this.evidences.forall(evidence contains _)).keys.toVector(0)
-      this.game.isObjectiveCompleted = true
+      this.game.completeObjective()
       s"""Evidence you have found: ${this.evidences.map(textWithColour(_, evidenceColour)).mkString(", ")} and the ghost is ${textWithColour(ghostType, ghostColour)}
          |You can now finish investigation from the truck with ${textWithColour("finish", commandColour)}
          |${this.getLocationInfo}""".stripMargin
@@ -60,7 +68,7 @@ class Player(val game: Game):
   def go(newRoom: String) = {
     val roomNames = this.accessibleRooms.map(_.name)
 
-    if this.game.isHouseUnlocked then
+    if this.game.hasHouseBeenUnlocked then
       if (roomNames contains newRoom) && newRoom.nonEmpty then
         val roomIndex = roomNames.indexOf(newRoom)
         if roomIndex == 0 && this.location.name != "truck" then
@@ -80,7 +88,7 @@ class Player(val game: Game):
   }
 
   def isInGhostRoom: Boolean =
-    this.location.name == this.game.getGhost.favRoom.name
+    this.location.name == this.game.ghost.getFavRoom.name
 
   def take(itemName: String): String = {
     if this.location.hasItem(itemName) then
@@ -118,7 +126,7 @@ class Player(val game: Game):
   }
 
   def inspect(itemName: String): String = {
-    if this.inventory.exists(_.name == "writing book") || this.location.items.exists(_.name == "writing book") then
+    if this.inventory.exists(_.name == "writing book") || this.location.getItems.exists(_.name == "writing book") then
       this.game.writingBook.use + "\n" + this.getLocationInfo
     else
       s"You don't have any items to inspect. You can only inspect ${this.game.writingBook.toString}"
@@ -130,7 +138,7 @@ class Player(val game: Game):
   }
 
   def quit = {
-    this.hasQuit = true
+    this.game.playerQuit()
     "Player has quit the game"
   }
 end Player

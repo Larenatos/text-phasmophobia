@@ -15,7 +15,7 @@ class Thermometer(game: Game) extends Item(game):
   val name = "thermometer"
 
   def use: String = {
-    val temperature = this.game.player.location.temperature
+    val temperature = this.game.player.location.getTemperature
     var text = s"Temperature in this room is ${textWithColour(temperature.toString + " celsius", temperatureColour)}"
 
     if temperature < 1 then
@@ -30,7 +30,7 @@ class VideoCamera(game: Game) extends Item(game):
   val name = "video camera"
 
   def use: String = {
-    if this.game.player.isInGhostRoom && (this.game.getGhost.evidence contains "ghost orb") then
+    if this.game.player.isInGhostRoom && (this.game.ghost.evidence contains "ghost orb") then
       this.game.player.addEvidence("ghost orb")
       s"There is a ${textWithColour("ghost orb", evidenceColour)} floating in this room. This is an evidence for the ghost." + this.evidenceText
     else
@@ -42,7 +42,7 @@ class SpiritBox(game: Game) extends Item(game):
   val name = "spirit box"
 
   def use: String = {
-    if this.game.player.isInGhostRoom && (this.game.getGhost.evidence contains "spirit box") then
+    if this.game.player.isInGhostRoom && (this.game.ghost.evidence contains "spirit box") then
       this.game.player.addEvidence("spirit box")
       s"You got a response from the ghost in ${textWithColour("spirit box", evidenceColour)}. This is an evidence for the ghost." + this.evidenceText
     else
@@ -52,7 +52,11 @@ end SpiritBox
 
 class WritingBook(game: Game) extends Item(game):
   val name = "writing book"
-  var isWrittenTo = false
+  private var isWrittenTo = false
+
+  def reset(): Unit = {
+    this.isWrittenTo = false
+  }
 
   def trigger() = {
     if !this.isWrittenTo && Random.nextInt(101) < 60 then

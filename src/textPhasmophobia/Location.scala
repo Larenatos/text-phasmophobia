@@ -4,44 +4,81 @@ import scala.util.Random
 
 sealed trait Location(game: Game):
   val name: String
-  var items: Vector[Item]
-  var temperature: Double
+
+  def reset(): Unit
+
+  def getItems: Vector[Item]
+
+  def removeItem(item: Item): Unit
+
+  def addItem(item: Item): Unit
 
   def updateTemperature(): Unit
 
+  def getTemperature: Double
+
   def takeItem(itemName: String): Item = {
-    this.items.find(_.name == itemName) match {
+    this.getItems.find(_.name == itemName) match {
       case Some(item) => {
-        this.items = this.items.filter(_.name != itemName)
+        this.removeItem(item)
         item
       }
     }
   }
 
   def hasItem(itemName: String): Boolean = {
-    this.items.map(_.name) contains itemName
+    this.getItems.map(_.name) contains itemName
   }
 
-  def addItem(item: Item): Unit = {
-    this.items = this.items :+ item
-  }
+
 
   override def toString: String = textWithColour(this.name, roomColour)
 end Location
 
 class Truck(game: Game) extends Location(game):
   val name = "truck"
-  var items: Vector[Item] = Vector(game.thermometer, game.spiritBox, game.videoCamera, game.writingBook)
-  var temperature = 15
+  private var items: Vector[Item] = Vector.empty
+  private var temperature = 15
 
-  def updateTemperature() = {
-    this.temperature = 15
+  def reset() = {
+    this.items = Vector(game.thermometer, game.spiritBox, game.videoCamera, game.writingBook)
   }
+
+  def getItems = this.items
+
+  def removeItem(item: Item) = {
+    this.items = this.items.filter(_ != item)
+  }
+
+  def addItem(item: Item) = {
+    this.items = this.items :+ item
+  }
+
+  def updateTemperature(): Unit =
+    this.temperature = 15
+
+  def getTemperature = this.temperature
 end Truck
 
 class Room(val name: String, game: Game) extends Location(game):
-  var items: Vector[Item] = Vector.empty
-  var temperature: Double = roundToDecimals(Random.nextFloat * 3 + 19, 1)
+  private var items: Vector[Item] = Vector.empty
+  private var temperature: Double = roundToDecimals(Random.nextFloat * 3 + 19, 1)
+
+  def reset() = {
+    this.items = Vector.empty
+  }
+
+  def getItems = this.items
+
+  def removeItem(item: Item) = {
+    this.items = this.items.filter(_ != item)
+  }
+
+  def addItem(item: Item) = {
+    this.items = this.items :+ item
+  }
+
+  def getTemperature = this.temperature
 
   private def changeTemp(addition: Float) = {
     this.temperature = roundToDecimals(this.temperature.toFloat + addition, 1)
@@ -50,10 +87,9 @@ class Room(val name: String, game: Game) extends Location(game):
   def updateTemperature() = {
     val isNegative = Random.nextBoolean()
 
-
-    if this.game.getGhost.favRoom.name == this.name then
+    if this.game.ghost.getFavRoom.name == this.name then
       // ghost room
-      if this.game.getGhost.evidence contains "freezing" then
+      if this.game.ghost.evidence contains "freezing" then
         // ghost has freezing as evidence
         if this.temperature > 2 || (isNegative && this.temperature > -15) then
           this.changeTemp(-2.toFloat * Random.nextFloat() - 2)

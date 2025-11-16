@@ -10,11 +10,21 @@ val ghostTypes: Map[String, Vector[String]] = Map.apply(
 )
 
 class Ghost(val game: Game):
-  val favRoom = this.game.area.getAllRooms(Random.nextInt(this.game.area.getAllRooms.length))
-  val kind = ghostTypes.keys.toVector(Random.nextInt(ghostTypes.keys.toVector.length))
-  val evidence = ghostTypes(this.kind)
+  private var favRoom = this.game.area.getRoom("").value // initiate with truck and override in reset()
+  private var kind = ""
+
+  def reset(): Unit = {
+    this.kind = ghostTypes.keys.toVector(Random.nextInt(ghostTypes.keys.toVector.length))
+    this.favRoom = this.game.area.getAllRoomsExceptTruck(Random.nextInt(this.game.area.getAllRoomsExceptTruck.length))
+  }
+
+  def evidence = ghostTypes(this.kind)
+
+  def getFavRoom = this.favRoom
 
   def test = s"Favourite room: ${this.favRoom}\nKind: ${this}"
 
-  override def toString: String = Console.RED + this.kind + Console.RESET
+  def getKind = this.kind
+
+  override def toString: String = textWithColour(this.kind, ghostColour)
 end Ghost

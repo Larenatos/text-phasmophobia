@@ -22,6 +22,12 @@ class Area(val game: Game):
       ))
     ))
 
+  def reset() = {
+    this.getRoomsInVector(this.rooms).foreach(_.reset())
+  }
+
+  def getRooms = this.rooms
+
   def getRoom(location: String) = {
     var roomNode = this.rooms
 
@@ -48,7 +54,7 @@ class Area(val game: Game):
     current.value +: childVector
   }
 
-  def getAllRooms: Vector[Location] = this.getRoomsInVector(this.rooms.children(0))
+  def getAllRoomsExceptTruck: Vector[Location] = this.getRoomsInVector(this.rooms.children(0))
 
   private def printTree(current: Node[Location], indent: String = ""): Vector[String] = {
     var childStrings: Vector[String] = Vector.empty
