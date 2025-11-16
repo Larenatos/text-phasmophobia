@@ -1,5 +1,3 @@
-This project is made for a programming course in Aalto University.
-
 The goal is to create a puzzle game in text form so run in a console and the player enters commands to it. 
 My project is supposed be a simplified version of Phasmophobia that can be played in this format.
 
