@@ -1,6 +1,6 @@
 package textPhasmophobia
 
-class Action(input: String, val game: Game):
+class Action(input: String, private val game: Game):
   private val commandText = input.trim.toLowerCase
   private val verb        = commandText.takeWhile( _ != ' ' )
   private val modifiers   = commandText.drop(verb.length).trim.toLowerCase

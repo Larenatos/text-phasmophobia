@@ -1,24 +1,21 @@
 package textPhasmophobia
 
 import scala.util.Random
+import scala.collection.mutable.Buffer
 
-sealed trait Location(game: Game):
+sealed trait Location(private val game: Game):
   val name: String
+  val items: Buffer[Item] = Buffer.empty
+  protected var temperature: Double
 
   def reset(): Unit
 
-  def getItems: Vector[Item]
-
-  def removeItem(item: Item): Unit
-
-  def addItem(item: Item): Unit
-
   def updateTemperature(): Unit
 
-  def getTemperature: Double
+  def getTemperature: Double = this.temperature
 
   def takeItem(itemName: String): Item = {
-    this.getItems.find(_.name == itemName) match {
+    this.items.find(_.name == itemName) match {
       case Some(item) => {
         this.removeItem(item)
         item
@@ -26,59 +23,42 @@ sealed trait Location(game: Game):
     }
   }
 
-  def hasItem(itemName: String): Boolean = {
-    this.getItems.map(_.name) contains itemName
+  def removeItem(item: Item) = {
+    this.items.remove(this.items.indexOf(item))
   }
 
+  def addItem(item: Item) = {
+    this.items.append(item)
+  }
 
+  def hasItem(itemName: String): Boolean = {
+    this.items.map(_.name) contains itemName
+  }
 
   override def toString: String = textWithColour(this.name, roomColour)
 end Location
 
+
 class Truck(game: Game) extends Location(game):
   val name = "truck"
-  private var items: Vector[Item] = Vector.empty
-  private var temperature = 15
+  var temperature: Double = 15
 
   def reset() = {
-    this.items = Vector(game.thermometer, game.spiritBox, game.videoCamera, game.writingBook)
-  }
-
-  def getItems = this.items
-
-  def removeItem(item: Item) = {
-    this.items = this.items.filter(_ != item)
-  }
-
-  def addItem(item: Item) = {
-    this.items = this.items :+ item
+    this.items.clear()
+    Vector(game.thermometer, game.spiritBox, game.videoCamera, game.writingBook).foreach(this.items.append(_))
   }
 
   def updateTemperature(): Unit =
     this.temperature = 15
 
-  def getTemperature = this.temperature
 end Truck
 
 class Room(val name: String, game: Game) extends Location(game):
-  private var items: Vector[Item] = Vector.empty
-  private var temperature: Double = roundToDecimals(Random.nextFloat * 3 + 19, 1)
+  var temperature: Double = roundToDecimals(Random.nextFloat * 3 + 19, 1)
 
   def reset() = {
-    this.items = Vector.empty
+    this.items.clear()
   }
-
-  def getItems = this.items
-
-  def removeItem(item: Item) = {
-    this.items = this.items.filter(_ != item)
-  }
-
-  def addItem(item: Item) = {
-    this.items = this.items :+ item
-  }
-
-  def getTemperature = this.temperature
 
   private def changeTemp(addition: Float) = {
     this.temperature = roundToDecimals(this.temperature.toFloat + addition, 1)

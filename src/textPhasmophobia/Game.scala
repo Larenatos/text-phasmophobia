@@ -79,7 +79,7 @@ class Game:
 
   val area = Area(this)
   val player = Player(this)
-  val ghost: Ghost = Ghost(this)
+  val ghost = Ghost(this)
 
   // items for the investigation
   val thermometer = Thermometer(this)
@@ -153,7 +153,7 @@ class Game:
   }
 
   def updateWritingBook() = {
-    if this.ghost.getFavRoom.getItems.exists(_.name == "writing book") then {
+    if this.ghost.getFavRoom.items.exists(_.name == "writing book") then {
       this.writingBook.trigger()
     }
   }

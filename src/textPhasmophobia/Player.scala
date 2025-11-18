@@ -1,47 +1,50 @@
 package textPhasmophobia
 
-import scala.collection.mutable.Map
+import scala.collection.mutable.Buffer
 
-class Player(val game: Game):
+class Player(private val game: Game):
+  val inventory: Buffer[Item] = Buffer.empty
+  val evidences: Buffer[String] = Buffer.empty
+
   private var mapLocation = ""
   private var accessibleRooms = this.game.area.getAccessibleRooms(this.mapLocation)
-  private var inventory: Vector[Item] = Vector.empty
   private var currentLocation: Location = this.game.area.getRoom(this.mapLocation).value
-  private var evidences: Vector[String] = Vector.empty
   private var equippedItem: Option[Item] = None
 
   def reset() = {
+    this.inventory.clear()
+    this.evidences.clear()
     this.mapLocation = ""
     this.accessibleRooms = this.game.area.getAccessibleRooms(this.mapLocation)
-    this.inventory = Vector.empty
     this.currentLocation = this.game.area.getRoom(this.mapLocation).value
-    this.evidences = Vector.empty
     this.equippedItem = None
   }
 
   def location = currentLocation
 
-  def getInventory = this.inventory
-
-  private def updateRoomData(): Unit =
+  private def updateRoomData(): Unit = {
     this.accessibleRooms = this.game.area.getAccessibleRooms(this.mapLocation)
     this.currentLocation = this.game.area.getRoom(this.mapLocation).value
+  }
 
-  private def accessibleRoomNames = this.accessibleRooms.filter(_.name.nonEmpty).map(_.toString)
+  private def accessibleRoomNames = {
+    this.accessibleRooms.map(_.toString)
+  }
 
-  def getLocationInfo =
+  def getLocationInfo = {
     s"""You are now in ${this.location.toString}.
        |Rooms accessible from here are: ${this.accessibleRoomNames.mkString(", ")}
-       |This room has ${if this.location.getItems.nonEmpty then this.location.getItems.map(_.toString).mkString(", ") else "no items"}""".stripMargin
+       |This room has ${if this.location.items.nonEmpty then this.location.items.map(_.toString).mkString(", ") else "no items"}""".stripMargin
+  }
 
   def addEvidence(evidence: String) = {
     if !(this.evidences contains evidence) then
-      this.evidences = this.evidences :+ evidence
+      this.evidences.append(evidence)
   }
 
   def equipItem(itemName: String): String = {
     if this.inventory.exists(_.name == itemName) && (Vector("thermometer", "video camera", "spirit box") contains itemName) then
-      val item = this.inventory.filter(_.name == itemName)(0)
+      val item = this.inventory.filter(_.name == itemName).head
       this.equippedItem = Some(item)
       s"""You have now equipped ${textWithColour(itemName, itemColour)}. When you enter a room you will get info from this item.
          |${this.getLocationInfo}""".stripMargin
@@ -87,14 +90,15 @@ class Player(val game: Game):
          |${this.getLocationInfo}""".stripMargin
   }
 
-  def isInGhostRoom: Boolean =
+  def isInGhostRoom: Boolean = {
     this.location.name == this.game.ghost.getFavRoom.name
+  }
 
   def take(itemName: String): String = {
     if this.location.hasItem(itemName) then
       if this.inventory.length < 2 then
         val item = this.location.takeItem(itemName)
-        this.inventory = this.inventory :+ item
+        this.inventory.append(item)
         s"""You picked up $item
            |${this.getLocationInfo}""".stripMargin
       else
@@ -106,9 +110,9 @@ class Player(val game: Game):
   }
 
   def drop(itemName: String): String = {
-    if this.getInventory.exists(_.name == itemName) then
-      val item = this.getInventory.filter(_.name == itemName)(0)
-      this.inventory = this.inventory.filter(_.name != itemName)
+    if this.inventory.exists(_.name == itemName) then
+      val item = this.inventory.filter(_.name == itemName).head
+      this.inventory.remove(this.inventory.indexOf(item))
       this.location.addItem(item)
       s"""You place ${textWithColour(itemName, itemColour)} in ${textWithColour(this.location.name, roomColour)}
          |${this.getLocationInfo}""".stripMargin
@@ -130,14 +134,14 @@ class Player(val game: Game):
   }
 
   def inspect(itemName: String): String = {
-    if this.inventory.exists(_.name == "writing book") || this.location.getItems.exists(_.name == "writing book") then
+    if this.inventory.exists(_.name == "writing book") || this.location.items.exists(_.name == "writing book") then
       this.game.writingBook.use + "\n" + this.getLocationInfo
     else
       s"You don't have any items to inspect. You can only inspect ${this.game.writingBook.toString}"
   }
 
   def getInventoryText = {
-    val text = if this.getInventory.nonEmpty then s"Your inventory contains (${this.inventory.length}/2): ${this.getInventory.mkString(", ")}\n" else "Your inventory is empty (0/2)\n"
+    val text = if this.inventory.nonEmpty then s"Your inventory contains (${this.inventory.length}/2): ${this.inventory.mkString(", ")}\n" else "Your inventory is empty (0/2)\n"
     text + this.getLocationInfo
   }
 

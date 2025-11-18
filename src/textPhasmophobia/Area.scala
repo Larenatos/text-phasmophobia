@@ -1,8 +1,10 @@
 package textPhasmophobia
 
+import scala.collection.mutable.Buffer
+
 case class Node[location](value: location, children: Vector[Node[location]])
 
-class Area(val game: Game):
+class Area(private val game: Game):
   val rooms: Node[Location] =
     Node(Truck(this.game), Vector(
       Node(Room("foyer", this.game), Vector(
@@ -39,13 +41,16 @@ class Area(val game: Game):
   }
 
   def getAccessibleRooms(location: String): Vector[Location] = {
-    val parentRoom: Vector[Location] = if location.nonEmpty then
-      Vector(this.getRoom(location.dropRight(1)).value)
-    else
-      Vector.empty
+    val rooms: Buffer[Location] = Buffer.empty
+
+    if location.nonEmpty then
+      rooms.append(this.getRoom(location.dropRight(1)).value)
+
+    if !(rooms contains this.rooms.value) && location.nonEmpty then
+      rooms.append(this.rooms.value)
 
     val children = this.getRoom(location).children
-    parentRoom ++ children.map(_.value)
+    rooms.toVector ++ children.map(_.value)
   }
 
   private def getRoomsInVector(current: Node[Location]): Vector[Location] = {

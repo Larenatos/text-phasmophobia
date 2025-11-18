@@ -2,7 +2,7 @@ package textPhasmophobia
 
 import scala.util.Random
 
-sealed trait Item(game: Game):
+sealed trait Item(private val game: Game):
   val name: String
   val evidenceText = s"\nCheck what evidences you have found and what ghost type it could be with ${textWithColour("journal", commandColour)}"
 

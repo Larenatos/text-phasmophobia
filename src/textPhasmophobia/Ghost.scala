@@ -9,7 +9,7 @@ val ghostTypes: Map[String, Vector[String]] = Map.apply(
   "Moroi" -> Vector("spirit box", "ghost writing", "freezing")
 )
 
-class Ghost(val game: Game):
+class Ghost(private val game: Game):
   private var favRoom = this.game.area.getRoom("").value // initiate with truck and override in reset()
   private var kind = ""
 
