@@ -4,7 +4,7 @@ import scala.collection.mutable.Buffer
 
 class Player(private val game: Game):
   val inventory: Buffer[Item] = Buffer.empty
-  val evidences: Buffer[String] = Buffer.empty
+  val evidence: Buffer[String] = Buffer.empty
 
   private var mapLocation = ""
   private var accessibleRooms = this.game.area.getAccessibleRooms(this.mapLocation)
@@ -13,7 +13,7 @@ class Player(private val game: Game):
 
   def reset() = {
     this.inventory.clear()
-    this.evidences.clear()
+    this.evidence.clear()
     this.mapLocation = ""
     this.accessibleRooms = this.game.area.getAccessibleRooms(this.mapLocation)
     this.currentLocation = this.game.area.getRoom(this.mapLocation).value
@@ -38,8 +38,8 @@ class Player(private val game: Game):
   }
 
   def addEvidence(evidence: String) = {
-    if !(this.evidences contains evidence) then
-      this.evidences.append(evidence)
+    if !(this.evidence contains evidence) then
+      this.evidence.append(evidence)
   }
 
   def equipItem(itemName: String): String = {
@@ -54,17 +54,17 @@ class Player(private val game: Game):
   }
 
   def getEvidenceInfo: String = {
-    if this.evidences.isEmpty then
+    if this.evidence.isEmpty then
       s"""You not found any evidence yet. The ghost could be anything
          |${this.getLocationInfo}""".stripMargin
-    else if this.evidences.length == 3 then
-      val ghostType = ghostTypes.filter((name, evidence) => this.evidences.forall(evidence contains _)).keys.toVector(0)
+    else if this.evidence.length == 3 then
+      val ghostType = ghostTypes.filter((name, evidence) => this.evidence.forall(evidence contains _)).keys.toVector(0)
       this.game.completeObjective()
-      s"""Evidence you have found: ${this.evidences.map(textWithColour(_, evidenceColour)).mkString(", ")} and the ghost is ${textWithColour(ghostType, ghostColour)}
+      s"""Evidence you have found: ${this.evidence.map(textWithColour(_, evidenceColour)).mkString(", ")} and the ghost is ${textWithColour(ghostType, ghostColour)}
          |You can now finish investigation from ${textWithColour("truck", roomColour)} with ${textWithColour("finish", commandColour)}
          |${this.getLocationInfo}""".stripMargin
     else
-      s"""Evidence you have found: ${this.evidences.map(textWithColour(_, evidenceColour)).mkString(", ")}. The ghost could be ${ghostTypes.filter((name, evidence) => this.evidences.forall(evidence contains _)).keys.map(textWithColour(_, ghostColour)).mkString(", ")}
+      s"""Evidence you have found: ${this.evidence.map(textWithColour(_, evidenceColour)).mkString(", ")}. The ghost could be ${ghostTypes.filter((name, evidence) => this.evidence.forall(evidence contains _)).keys.map(textWithColour(_, ghostColour)).mkString(", ")}
          |${this.getLocationInfo}""".stripMargin
   }
 
@@ -74,12 +74,17 @@ class Player(private val game: Game):
     if this.game.hasHouseBeenUnlocked then
       if (roomNames contains newRoom) && newRoom.nonEmpty then
         val roomIndex = roomNames.indexOf(newRoom)
-        if roomIndex == 0 && this.location.name != "truck" then
-          this.mapLocation = this.mapLocation.dropRight(1)
+
+        if newRoom == "truck" && this.mapLocation.nonEmpty then
+          this.mapLocation = ""
           this.updateRoomData()
         else
-          this.mapLocation = if roomNames.length > 1 then this.mapLocation + (roomIndex - 1).toString else this.mapLocation + roomIndex.toString
-          this.updateRoomData()
+          if roomIndex == 0 && this.location.name != "truck" then
+            this.mapLocation = this.mapLocation.dropRight(1)
+            this.updateRoomData()
+          else
+            this.mapLocation = if roomNames.length > 1 then this.mapLocation + (roomIndex - 1).toString else this.mapLocation + roomIndex.toString
+            this.updateRoomData()
 
         this.equippedItem.fold(this.getLocationInfo)(item => s"Your equipped item tells you: ${item.use}\n" + this.getLocationInfo)
       else

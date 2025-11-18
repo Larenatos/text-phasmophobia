@@ -4,7 +4,7 @@ import scala.util.Random
 
 sealed trait Item(private val game: Game):
   val name: String
-  val evidenceText = s"\nCheck what evidences you have found and what ghost type it could be with ${textWithColour("journal", commandColour)}"
+  val evidenceText = s"\nCheck what evidence you have found and what ghost type it could be with ${textWithColour("journal", commandColour)}"
 
   def use: String
 

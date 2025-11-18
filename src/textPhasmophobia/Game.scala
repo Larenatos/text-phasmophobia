@@ -12,17 +12,17 @@ class Game:
     s"""Here is a list of ${textWithColour("commands", commandColour)} you can use
        |${textWithColour("help", commandColour)}            - Print this message
        |${textWithColour("tutorial", commandColour)}        - Print a long text with introduction on how to play this game
-       |${textWithColour("learn <thing>", commandColour)}   - Show information regarding <thing>. Info only exists for: ghost, evidence
+       |${textWithColour("learn <thing>", commandColour)}   - Show information regarding <thing>. Info only exists for: ${textWithColour("ghost", ghostColour)}, ${textWithColour("evidence", evidenceColour)}
        |${textWithColour("start", commandColour)}           - Start an investigation if there is no ongoing investigation
        |${textWithColour("unlock <target>", commandColour)} - Usually ${textWithColour("unlock", commandColour)} ${textWithColour("house", roomColour)}. This is used to actually start the investigation into the house
        |${textWithColour("go <name>", commandColour)}       - More to room <name> if it exists and is accessible from where you are now
        |${textWithColour("take", commandColour)}            - Will take an item from this room if it is here and put it into your inventory
        |${textWithColour("drop", commandColour)}            - Place an item in your current location
        |${textWithColour("inventory", commandColour)}       - Show all the items in your inventory at this time
-       |${textWithColour("journal", commandColour)}         - Show what ${textWithColour("evidences", evidenceColour)} you have found and possible ${textWithColour("ghost types", ghostColour)}. It also shows you if you have completed the objective or not
+       |${textWithColour("journal", commandColour)}         - Show what ${textWithColour("evidence", evidenceColour)} you have found and possible ${textWithColour("ghost types", ghostColour)}. It also shows you if you have completed the objective or not
        |${textWithColour("use <item>", commandColour)}      - Uses ${textWithColour("<item>", itemColour)} from players inventory and you will get a result for using that item
        |${textWithColour("equip <item>", commandColour)}    - Equips ${textWithColour("<item>", itemColour)} and after that when ever you go to a room you will use that item and get results. Easy way to find where the ghost is
-       |${textWithColour("inspect <item>", commandColour)}  - Inspects ${textWithColour("<item>", itemColour)} and you get info of that item. You can only inspect ${textWithColour("writing book", itemColour)} to see if the ghost has written to it. This is 1 evidence
+       |${textWithColour("inspect <item>", commandColour)}  - Inspects ${textWithColour("<item>", itemColour)} and you get info of that item. You can only inspect ${textWithColour("writing book", itemColour)} to see if the ghost has written to it. This is one type of ${textWithColour("evidence", evidenceColour)}
        |${textWithColour("finish", commandColour)}          - Finish an investigation if you are in the truck and you have started an investigation
        |${textWithColour("quit", commandColour)}            - Quit the whole game program
        |
@@ -30,10 +30,10 @@ class Game:
   val tutorialText =
     s"""${this.helpText}
        |
-       |An investigation starts with you the player arriving to a haunted house in a truck. You are given a key to they house and use that to unlock the house with ${textWithColour("unlock house", commandColour)}.
+       |An investigation starts with you the player arriving to a haunted house in a truck. You are given a key to the house and use that to unlock the house with ${textWithColour("unlock house", commandColour)}.
        |Once the house is unlocked the temperatures will start to fluctuate inside. It is important because every room starts at the same temperature but in the ghost room the temperature starts to drop.
-       |It is recommended to use a thermometer to find the ghost room. It is also used to find out if the ghost has ${textWithColour("freezing", evidenceColour)} as evidence.
-       |There are currently 4 ghost types and they each have 3 specific evidences that you need to test for in order to know which ghost it is. Get more info on that by typing the command ${textWithColour("learn ghost", commandColour)}
+       |It is recommended to use a thermometer to find the ghost room. It is also used to find out if the ghost has ${textWithColour("freezing", evidenceColour)} as ${textWithColour("evidence", evidenceColour)}.
+       |There are currently 4 ghost types and they each have 3 specific ${textWithColour("evidence", evidenceColour)} that you need to test for in order to know which ghost it is. Get more info on that by typing the command ${textWithColour("learn ghost", commandColour)}
        |You can pick up items with ${textWithColour("take", commandColour)} ${textWithColour("<item>", itemColour)} and once you have it in your inventory you can type ${textWithColour("use", commandColour)} ${textWithColour("<item>", itemColour)} or ${textWithColour("equip", commandColour)} ${textWithColour("<item>", itemColour)} to get information out of them.
        |You get notified if you find ${textWithColour("evidence", evidenceColour)} while using an item and they will be marked in your journal. Journal contains your found ${textWithColour("evidence", evidenceColour)} and what ${textWithColour("ghost types", ghostColour)} it could be. You can view your journal with ${textWithColour("journal", commandColour)}
        |To learn more about evidence and items enter the command ${textWithColour("learn evidence", commandColour)}
@@ -43,19 +43,19 @@ class Game:
        |${textWithColour("unlock house", commandColour)}         - opens the locked door to the house
        |${textWithColour("take thermometer", commandColour)}     - picks up ${textWithColour("thermometer", itemColour)} from the truck
        |${textWithColour("take writing book", commandColour)}    - You can also take another item because you have 2 inventory slots
-       |${textWithColour("equip thermometer", commandColour)}    - Equipt the item so that you get information from it everytime you enter a room
+       |${textWithColour("equip thermometer", commandColour)}    - Equip the item so that you get information from it everytime you enter a room
        |${textWithColour("go foyer", commandColour)}             - Goes to ${textWithColour("foyer", roomColour)} and prints out the ${textWithColour("temperature", temperatureColour)} in that room you went to. Visit rooms like this until you find the ghost room
        |${textWithColour("go living room", commandColour)}       - Track which rooms you have already been to and go to other ones. You are looking for a room with temperature below ${textWithColour("15 celsius", temperatureColour)}
-       |${textWithColour("drop writing book", commandColour)}    - When you find the ghost room, place writing book there and the ghost has chance to write to it on every turn if it is one of the evidences for that ghost
+       |${textWithColour("drop writing book", commandColour)}    - When you find the ghost room, place writing book there and the ghost has chance to write to it on every turn if it is one of the ${textWithColour("evidence", evidenceColour)} for that ghost
        |${textWithColour("inspect writing book", commandColour)} - See if the ghost has written on the book
-       |You will need to go and take more items from the truck to find all 3 evidences. You can leave the currents items in the ghost room with ${textWithColour("drop <item>", commandColour)}""".stripMargin
+       |You will need to go and take more items from the truck to find all 3 ${textWithColour("evidence", evidenceColour)}. You can leave the current items in the ghost room with ${textWithColour("drop <item>", commandColour)}""".stripMargin
   val learnGhostText =
     s"""There are ${ghostTypes.keys.toVector.length} ghost types currently: ${ghostTypes.keys.map(textWithColour(_, ghostColour)).mkString(", ")}
-       |Each of them have different evidences that you need to test for. Find out more about each evidence with ${textWithColour("learn evidence", commandColour)}
-       |The evidences for each ghost are:
+       |Each of them have different ${textWithColour("evidence", evidenceColour)} that you need to test for. Find out more about each ${textWithColour("evidence", evidenceColour)} with ${textWithColour("learn evidence", commandColour)}
+       |The ${textWithColour("evidence", evidenceColour)} for each ghost are:
        |${ghostTypes.keys.map(key => s"${textWithColour(key, ghostColour)}: " + ghostTypes(key).map(textWithColour(_, evidenceColour)).mkString(", ")).mkString("\n")}""".stripMargin
   val learnEvidenceText =
-    s"""There are 4 evidence types: ${"freezing,ghost orb,writing,spirit box".split(",").map(textWithColour(_, evidenceColour)).mkString(", ")}. Here is a brief introduction to them
+    s"""There are 4 ${textWithColour("evidence", evidenceColour)} types: ${"freezing,ghost orb,writing,spirit box".split(",").map(textWithColour(_, evidenceColour)).mkString(", ")}. Here is a brief introduction to them
        |${textWithColour("freezing", evidenceColour)}   - The temperature in the ghost room can be lower than 1 Celsius. You can check for this with the ${textWithColour("thermometer", itemColour)}. You will have to check the temperature multiple times
        |${textWithColour("ghost orb", evidenceColour)}  - Ghost can have a floating orb in the ghost room. It is only visible through ${textWithColour("video camera", itemColour)}
        |${textWithColour("writing", evidenceColour)}    - While a ${textWithColour("writing book", itemColour)} is in the ghost room the ghost has a chance to write something in it. The book has to be dropped onto the floor first. You have to ${textWithColour("inspect", commandColour)} the ${textWithColour("writing book", itemColour)} to see if the ghost has written in it
@@ -65,7 +65,7 @@ class Game:
     target match {
       case "ghost"    => this.learnGhostText
       case "evidence" => this.learnEvidenceText
-      case other      => s"There is no info on ${target}. There is only info for: ghost, evidence"
+      case other      => s"There is no info on ${target}. There is only info for: ${textWithColour("ghost", ghostColour)}, ${textWithColour("evidence", evidenceColour)}"
     }
   }
 
@@ -129,7 +129,8 @@ class Game:
     if target == "house" then
       this.unlockHouseTurn = this.turnCount
       this.isHouseUnlocked = true
-      s"House is now unlocked. Now the ghost will start to interact with stuff and the ${textWithColour("temperature", temperatureColour)} will start to drop in the ghost room"
+      s"""House is now unlocked. Now the ghost will start to interact with stuff and the ${textWithColour("temperature", temperatureColour)} will start to drop in the ghost room
+         |${this.player.getLocationInfo}""".stripMargin
     else
       "House is already unlocked"
   }
