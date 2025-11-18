@@ -15,8 +15,7 @@ class Player(private val game: Game):
     this.inventory.clear()
     this.evidence.clear()
     this.mapLocation = ""
-    this.accessibleRooms = this.game.area.getAccessibleRooms(this.mapLocation)
-    this.currentLocation = this.game.area.getRoom(this.mapLocation).value
+    this.updateRoomData()
     this.equippedItem = None
   }
 
