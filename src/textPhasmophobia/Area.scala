@@ -46,11 +46,13 @@ class Area(private val game: Game):
     if location.nonEmpty then
       rooms.append(this.getRoom(location.dropRight(1)).value)
 
-    if !(rooms contains this.rooms.value) && location.nonEmpty then
-      rooms.append(this.rooms.value)
+    val children = this.getRoom(location).children.map(_.value)
 
-    val children = this.getRoom(location).children
-    rooms.toVector ++ children.map(_.value)
+    if !(rooms contains this.rooms.value) && location.nonEmpty then
+      rooms.toVector ++ children :+ this.rooms.value
+    else
+      rooms.toVector ++ children
+
   }
 
   private def getRoomsInVector(current: Node[Location]): Vector[Location] = {

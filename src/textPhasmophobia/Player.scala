@@ -10,6 +10,7 @@ class Player(private val game: Game):
   private var accessibleRooms = this.game.area.getAccessibleRooms(this.mapLocation)
   private var currentLocation: Location = this.game.area.getRoom(this.mapLocation).value
   private var equippedItem: Option[Item] = None
+  private val inventoryCap = 3
 
   def reset() = {
     this.inventory.clear()
@@ -104,7 +105,7 @@ class Player(private val game: Game):
 
   def take(itemName: String): String = {
     if this.location.hasItem(itemName) then
-      if this.inventory.length < 2 then
+      if this.inventory.length < this.inventoryCap then
         val item = this.location.takeItem(itemName)
         this.inventory.append(item)
         s"""You picked up $item ${item.getTutorialText}
@@ -118,22 +119,25 @@ class Player(private val game: Game):
   }
 
   def drop(itemName: String): String = {
-    if this.inventory.exists(_.name == itemName) then
-      val item = this.inventory.filter(_.name == itemName).head
-      this.inventory.remove(this.inventory.indexOf(item))
-      this.location.addItem(item)
-      s"""You place ${textWithColour(itemName, itemColour)} in ${textWithColour(this.location.name, roomColour)}
+    this.inventory.find(_.name.toLowerCase == itemName) match {
+      case Some(item) => {
+        this.inventory.remove(this.inventory.indexOf(item))
+        this.location.addItem(item)
+        s"""You place ${textWithColour(itemName, itemColour)} in ${textWithColour(this.location.name, roomColour)}
          |${this.getLocationInfo}""".stripMargin
-    else
-      s"""You don't have ${textWithColour(itemName, itemColour)} in your inventory
+      }
+      case None => {
+        s"""You don't have ${textWithColour(itemName, itemColour)} in your inventory
          |${this.getLocationInfo}""".stripMargin
+      }
+    }
   }
 
   def use(itemName: String): String = {
     if this.location.name == "truck" then
       "You can't use items while in the truck"
     else
-      this.inventory.find(_.name == itemName) match {
+      this.inventory.find(_.name.toLowerCase == itemName) match {
         case Some(item) => {
           item.use + "\n" + this.getLocationInfo
         }
@@ -149,8 +153,15 @@ class Player(private val game: Game):
   }
 
   def getInventoryText = {
-    val text = if this.inventory.nonEmpty then s"Your inventory contains (${this.inventory.length}/2): ${this.inventory.mkString(", ")}\n" else "Your inventory is empty (0/2)\n"
+    val text = if this.inventory.nonEmpty then s"Your inventory contains (${this.inventory.length}/${this.inventoryCap}): ${this.inventory.mkString(", ")}\n" else s"Your inventory is empty (0/${this.inventoryCap})\n"
     text + this.getLocationInfo
+  }
+
+  def isHearingEMFReader: Boolean = {
+    if !(this.inventory contains this.game.emfReader) && this.location.hasItem("emfReader") then
+      this.game.ghost.getEMFLevel > 1
+    else
+      false
   }
 
   def quit = {

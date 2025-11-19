@@ -5,8 +5,9 @@ import scala.util.Random
 sealed trait Item(private val game: Game):
   val name: String
   val evidenceText = s"\nCheck what evidence you have found and what ghost type it could be with ${textWithColour("journal", commandColour)}"
-  protected var tutorialText: String = s"You can use this item either with ${textWithColour("use " + this.name, commandColour)} or ${textWithColour("equip " + this.name, commandColour)}"
   protected var isTutorialTextShown = false
+
+  protected def tutorialText: String = s"You can use this item either with ${textWithColour("use " + this.name, commandColour)} or ${textWithColour("equip " + this.name, commandColour)}"
 
   def use: String
 
@@ -62,7 +63,7 @@ end SpiritBox
 
 class WritingBook(game: Game) extends Item(game):
   val name = "writing book"
-  this.tutorialText = s"You have to first enter: ${textWithColour("drop " + this.name, commandColour)} and then to check if the ghost has written on it: ${textWithColour("inspect " + this.name, commandColour)} while in the same room"
+  override def tutorialText = s"You have to first enter: ${textWithColour("drop " + this.name, commandColour)} and then to check if the ghost has written on it: ${textWithColour("inspect " + this.name, commandColour)} while in the same room"
   private var isWrittenTo = false
 
   def reset(): Unit = {
@@ -70,15 +71,36 @@ class WritingBook(game: Game) extends Item(game):
   }
 
   def trigger() = {
-    if !this.isWrittenTo && Random.nextInt(101) < 60 then
+    if !this.isWrittenTo then
       this.isWrittenTo = true
   }
 
   def use: String = {
     if this.isWrittenTo then
       this.game.player.addEvidence("ghost writing")
-      s"The ghost has written in this ${textWithColour("book", itemColour)}. This is an evidence for the ghost" + this.evidenceText
+      s"The ghost has written in this ${textWithColour("book", itemColour)}. This is a type of evidence for the ghost" + this.evidenceText
     else
       s"The ghost has not written on this book"
   }
 end WritingBook
+
+class EMFReader(game: Game) extends Item(game):
+  val name = "EMF reader"
+  override def tutorialText = {
+    s"""You can use this item either with ${textWithColour("use " + this.name, commandColour)} or ${textWithColour("equip " + this.name, commandColour)} or ${textWithColour("drop emf reader", commandColour)}.
+       |If you drop the reader in a room where the ghost has done an interaction in, you will hear it beep if you are in that room.
+       |There are different sounds for each level of reading so you will know if it is ${textWithColour("EMF 5", evidenceColour)} evidence""".stripMargin
+  }
+  def use: String = {
+    val emfLevel = this.game.ghost.getEMFLevel
+    if emfLevel > 1 then
+      if emfLevel == 5 then
+        this.game.player.addEvidence("EMF 5")
+        s"The ghost has interacted and there is an EMF reading of 5. This is a type of evidence for the ghost" + this.evidenceText
+      else
+        s"The ghost has interacted and there is an EMF reading of ${emfLevel}"
+    else
+      s"There is an EMF reading of 1"
+  }
+end EMFReader
+

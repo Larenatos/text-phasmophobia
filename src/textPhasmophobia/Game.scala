@@ -23,6 +23,7 @@ class Game:
        |${textWithColour("use <item>", commandColour)}      - Uses ${textWithColour("<item>", itemColour)} from players inventory and you will get a result for using that item
        |${textWithColour("equip <item>", commandColour)}    - Equips ${textWithColour("<item>", itemColour)} and after that when ever you go to a room you will use that item and get results. Easy way to find where the ghost is
        |${textWithColour("inspect <item>", commandColour)}  - Inspects ${textWithColour("<item>", itemColour)} and you get info of that item. You can only inspect ${textWithColour("writing book", itemColour)} to see if the ghost has written to it. This is one type of ${textWithColour("evidence", evidenceColour)}
+       |${textWithColour("observe", commandColour)}         - Adds a turn and use it when waiting for something to happen like ghost interaction for emf and writing book
        |${textWithColour("finish", commandColour)}          - Finish an investigation if you are in the truck and you have started an investigation
        |${textWithColour("quit", commandColour)}            - Quit the whole game program
        |
@@ -86,6 +87,9 @@ class Game:
   val spiritBox = SpiritBox(this)
   val videoCamera = VideoCamera(this)
   val writingBook = WritingBook(this)
+  val emfReader = EMFReader(this)
+
+  val investigationItems = Vector(this.thermometer, this.spiritBox, this.videoCamera, this.writingBook, this.emfReader)
 
   def isGameRunning = this.isGameStarted
 
@@ -153,18 +157,32 @@ class Game:
       this.area.getAllRoomsExceptTruck.foreach(_.updateTemperature())
   }
 
-  def updateWritingBook() = {
-    if this.ghost.getFavRoom.items.exists(_.name == "writing book") then {
-      this.writingBook.trigger()
-    }
-  }
-
   def playTurn(command: String): String = {
-    val outcomeReport = Action(command, this).execute()
-    if outcomeReport.isDefined && this.isGameStarted && Vector("test", "learn", "tutorial", "help").forall(text => !(command contains text)) then
+    if this.isGameStarted then
       this.updateRoomTemps()
-      this.updateWritingBook()
+      this.ghost.attemptInteraction()
+
+    val outcomeReport = Action(command, this).execute()
+    if outcomeReport.isDefined && Vector("test", "learn", "tutorial", "help").forall(text => !(command contains text)) then
       this.turnCount += 1
-    outcomeReport.getOrElse(s"""Unknown command: "$command".""")
+
+    // TODO move out of playTurn
+    outcomeReport match {
+      case Some(message) => {
+        var text = ""
+
+        if this.ghost.ifInteractedThisTurn && this.player.isInGhostRoom then
+          text = "You hear the ghost interacting with something. Check it out with EMF reader!\n"
+
+        if this.player.isHearingEMFReader then
+          text = s"You hear ${this.emfReader.toString} beeping for level ${this.ghost.getEMFLevel}\n"
+          if this.ghost.getEMFLevel == 5 then
+            text += this.emfReader.evidenceText + "\n"
+
+        text + message
+      }
+      case None => s"""Unknown command: "$command"."""
+
+    }
   }
 end Game

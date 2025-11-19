@@ -3,6 +3,8 @@ package textPhasmophobia
 import scala.util.Random
 import scala.collection.mutable.Buffer
 
+// TODO remake rooms in a way that they know which rooms are nearby for hearing distance of 1 room and ghost mechanics
+
 sealed trait Location(private val game: Game):
   val name: String
   val items: Buffer[Item] = Buffer.empty
@@ -15,7 +17,7 @@ sealed trait Location(private val game: Game):
   def getTemperature: Double = this.temperature
 
   def takeItem(itemName: String): Item = {
-    this.items.find(_.name == itemName) match {
+    this.items.find(_.name.toLowerCase == itemName) match {
       case Some(item) => {
         this.removeItem(item)
         item
@@ -32,7 +34,7 @@ sealed trait Location(private val game: Game):
   }
 
   def hasItem(itemName: String): Boolean = {
-    this.items.map(_.name) contains itemName
+    this.items.map(_.name.toLowerCase) contains itemName
   }
 
   override def toString: String = textWithColour(this.name, roomColour)
@@ -45,7 +47,7 @@ class Truck(game: Game) extends Location(game):
 
   def reset() = {
     this.items.clear()
-    Vector(game.thermometer, game.spiritBox, game.videoCamera, game.writingBook).foreach(this.items.append(_))
+    this.game.investigationItems.foreach(this.items.append(_))
   }
 
   def updateTemperature(): Unit =
