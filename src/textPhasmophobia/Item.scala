@@ -5,8 +5,18 @@ import scala.util.Random
 sealed trait Item(private val game: Game):
   val name: String
   val evidenceText = s"\nCheck what evidence you have found and what ghost type it could be with ${textWithColour("journal", commandColour)}"
+  protected var tutorialText: String = s"You can use this item either with ${textWithColour("use " + this.name, commandColour)} or ${textWithColour("equip " + this.name, commandColour)}"
+  protected var isTutorialTextShown = false
 
   def use: String
+
+  def getTutorialText: String = {
+    if !this.isTutorialTextShown then
+      this.isTutorialTextShown = true
+      "\n" + this.tutorialText
+    else
+      ""
+  }
 
   override def toString: String = textWithColour(this.name, itemColour)
 end Item
@@ -52,6 +62,7 @@ end SpiritBox
 
 class WritingBook(game: Game) extends Item(game):
   val name = "writing book"
+  this.tutorialText = s"You have to first enter: ${textWithColour("drop " + this.name, commandColour)} and then to check if the ghost has written on it: ${textWithColour("inspect " + this.name, commandColour)} while in the same room"
   private var isWrittenTo = false
 
   def reset(): Unit = {

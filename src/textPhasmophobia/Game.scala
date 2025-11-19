@@ -119,8 +119,8 @@ class Game:
       this.isGameStarted = true
       this.resetVariables()
       s"""You are now in ${textWithColour("truck", roomColour)} outside Tanglewood Drive 6.
-         |The house is haunted by a ghost.
-         |Your goal is to find out the ghost type and leave.
+         |Your goal is to find out the type of the ghost haunting this house and leave.
+         |Please read tutorial if you didn't do so yet.
          |You can move to a different room by typing ${textWithColour("go",commandColour)} ${textWithColour("<room name>", roomColour)}
          |${this.player.getLocationInfo.dropWhile(_ != '.').drop(3)}""".stripMargin
   }

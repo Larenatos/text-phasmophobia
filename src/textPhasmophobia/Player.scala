@@ -67,7 +67,11 @@ class Player(private val game: Game):
          |${this.getLocationInfo}""".stripMargin
   }
 
-  def go(newRoom: String) = {
+  def go(newRoom: String): String = {
+    if newRoom == this.location.name then
+      return s"""You are already in ${textWithColour(newRoom, roomColour)}.
+           |${this.getLocationInfo.dropWhile(_ != '.').drop(3)}""".stripMargin
+
     val roomNames = this.accessibleRooms.map(_.name)
 
     if this.game.hasHouseBeenUnlocked then
@@ -103,7 +107,7 @@ class Player(private val game: Game):
       if this.inventory.length < 2 then
         val item = this.location.takeItem(itemName)
         this.inventory.append(item)
-        s"""You picked up $item
+        s"""You picked up $item ${item.getTutorialText}
            |${this.getLocationInfo}""".stripMargin
       else
         s"""Your inventory is full
