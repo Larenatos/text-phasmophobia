@@ -19,27 +19,42 @@ class Action(input: String, private val game: Game):
     }
   }
 
-  // TODO refactor isGameRunning out of the one match case
+  // Two different methods where one takes in function that take parameters
+  private def runGameCommand(command: String => String): Option[String] = {
+    if this.game.isGameRunning then
+      Some(command(this.modifiers))
+    else
+      Some(this.startReminder)
+  }
+  // and this one takes function with no parameters
+  private def runGameCommand(command: () => String): Option[String] = {
+    if this.game.isGameRunning then
+      Some(command())
+    else
+      Some(this.startReminder)
+  }
+
   def execute(): Option[String] = {
-    this.verb match
+    this.verb match {
       case "help"      => Some(this.game.helpText)
       case "tutorial"  => Some(this.game.tutorialText)
       case "learn"     => Some(this.game.getLearnText(this.modifiers))
       case "start"     => Some(this.game.start())
-      case "unlock"    => if this.game.isGameRunning then Some(this.game.unlock(this.modifiers)) else Some(this.startReminder)
-      case "go"        => if this.game.isGameRunning then Some(this.game.player.go(this.modifiers)) else Some(this.startReminder)
-      case "take"      => if this.game.isGameRunning then Some(this.game.player.take(this.modifiers)) else Some(this.startReminder)
-      case "drop"      => if this.game.isGameRunning then Some(this.game.player.drop(this.modifiers)) else Some(this.startReminder)
-      case "inventory" => if this.game.isGameRunning then Some(this.game.player.getInventoryText) else Some(this.startReminder)
-      case "journal"   => if this.game.isGameRunning then Some(this.game.player.getEvidenceInfo) else Some(this.startReminder)
-      case "use"       => if this.game.isGameRunning then Some(this.game.player.use(this.modifiers)) else Some(this.startReminder)
-      case "equip"     => if this.game.isGameRunning then Some(this.game.player.equipItem(this.modifiers)) else Some(this.startReminder)
-      case "inspect"   => if this.game.isGameRunning then Some(this.game.player.inspect(this.modifiers)) else Some(this.startReminder)
-      case "observe"   => if this.game.isGameRunning then Some(this.game.player.observe) else Some(this.startReminder)
-      case "finish"    => if this.game.isGameRunning then Some(this.game.leaveInvestigation()) else Some(this.startReminder)
+      case "unlock"    => runGameCommand(this.game.unlock)
+      case "go"        => runGameCommand(this.game.player.go)
+      case "take"      => runGameCommand(this.game.player.take)
+      case "drop"      => runGameCommand(this.game.player.drop)
+      case "inventory" => runGameCommand(() => this.game.player.getInventoryText)
+      case "journal"   => runGameCommand(() => this.game.player.getEvidenceInfo)
+      case "use"       => runGameCommand(this.game.player.use)
+      case "equip"     => runGameCommand(this.game.player.equipItem)
+      case "inspect"   => runGameCommand(this.game.player.inspect)
+      case "observe"   => runGameCommand(() => this.game.player.observe)
+      case "finish"    => runGameCommand(() => this.game.leaveInvestigation())
       case "quit"      => Some(this.game.player.quit)
       case "test"      => Some(this.test(this.modifiers))
       case other       => None
+    }
   }
 end Action
 
