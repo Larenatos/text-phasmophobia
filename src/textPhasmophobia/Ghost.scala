@@ -18,6 +18,7 @@ class Ghost(private val game: Game):
   private var kind = ""
   private var interactionTime: Int = 0
   private var emfLevel: Int = 1
+  private val interactionEMFDuration = 3
 
   def reset(): Unit = {
     this.kind = "Spirit" //ghostTypes.keys.toVector(Random.nextInt(ghostTypes.keys.toVector.length))
@@ -34,24 +35,24 @@ class Ghost(private val game: Game):
 
   def getEMFLevel = this.emfLevel
 
-  def ifInteractedThisTurn = this.interactionTime == 2
+  def ifInteractedThisTurn = this.interactionTime == this.interactionEMFDuration
 
   def attemptInteraction(): Unit = {
     if this.interactionTime > 0 then
       this.interactionTime -= 1
 
-      if this.interactionTime == 0 then
-        this.emfLevel = 1
+    if this.interactionTime == 0 && this.emfLevel != 1 then
+      this.emfLevel = 1
 
-    if Random.nextFloat() < 0.33 then // TODO adjust chances and durations
-      this.interactionTime = 2
+    if Random.nextFloat() < 0.4 then // TODO adjust chances and durations
+      this.interactionTime = this.interactionEMFDuration
 
       // maybe trigger writing book if it is in the ghost room
-      if (this.evidence contains "ghost writing") && this.favRoom.items.exists(_.name == "writing book") && Random.nextFloat < 0.4 then
+      if (this.evidence contains "ghost writing") && this.favRoom.items.exists(_.name == "writing book") && Random.nextFloat() < 0.4 then
         this.game.writingBook.trigger()
 
       // TODO differentiate level 2 and 3 or random
-      this.emfLevel = if (this.evidence contains "EMF 5") && Random.nextFloat() < 0.33 then 5 else 2
+      this.emfLevel = if this.evidence contains "EMF 5" then 5 else 2
   }
 
   override def toString: String = textWithColour(this.kind, ghostColour)

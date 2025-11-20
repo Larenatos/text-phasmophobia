@@ -91,12 +91,13 @@ class EMFReader(game: Game) extends Item(game):
        |If you drop the reader in a room where the ghost has done an interaction in, you will hear it beep if you are in that room.
        |There are different sounds for each level of reading so you will know if it is ${textWithColour("EMF 5", evidenceColour)} evidence""".stripMargin
   }
+
   def use: String = {
     val emfLevel = this.game.ghost.getEMFLevel
     if emfLevel > 1 then
       if emfLevel == 5 then
         this.game.player.addEvidence("EMF 5")
-        s"The ghost has interacted and there is an EMF reading of 5. This is a type of evidence for the ghost" + this.evidenceText
+        s"The ghost has interacted and there is an ${textWithColour("EMF 5", evidenceColour)} reading. This is a type of evidence for the ghost" + this.evidenceText
       else
         s"The ghost has interacted and there is an EMF reading of ${emfLevel}"
     else

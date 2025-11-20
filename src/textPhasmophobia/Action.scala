@@ -35,7 +35,7 @@ class Action(input: String, private val game: Game):
       case "use"       => if this.game.isGameRunning then Some(this.game.player.use(this.modifiers)) else Some(this.startReminder)
       case "equip"     => if this.game.isGameRunning then Some(this.game.player.equipItem(this.modifiers)) else Some(this.startReminder)
       case "inspect"   => if this.game.isGameRunning then Some(this.game.player.inspect(this.modifiers)) else Some(this.startReminder)
-      case "observe"   => if this.game.isGameRunning then Some(this.game.player.getLocationInfo) else Some(this.startReminder)
+      case "observe"   => if this.game.isGameRunning then Some(this.game.player.observe) else Some(this.startReminder)
       case "finish"    => if this.game.isGameRunning then Some(this.game.leaveInvestigation()) else Some(this.startReminder)
       case "quit"      => Some(this.game.player.quit)
       case "test"      => Some(this.test(this.modifiers))

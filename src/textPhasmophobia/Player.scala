@@ -55,7 +55,7 @@ class Player(private val game: Game):
 
   def getEvidenceInfo: String = {
     if this.evidence.isEmpty then
-      s"""You not found any evidence yet. The ghost could be anything
+      s"""You have not found any evidence yet. The ghost could be anything
          |${this.getLocationInfo}""".stripMargin
     else if this.evidence.length == 3 then
       val ghostType = ghostTypes.filter((name, evidence) => this.evidence.forall(evidence contains _)).keys.toVector(0)
@@ -95,7 +95,7 @@ class Player(private val game: Game):
         s"""There is no such room as ${textWithColour(newRoom, roomColour)} or you can't access it from here.
            |${this.getLocationInfo}""".stripMargin
     else
-      s"""You need to unlock the house first. You can do that by entering ${textWithColour("unlock", commandColour)} ${textWithColour("house", roomColour)}
+      s"""You need to unlock the house first. You can do that by entering ${textWithColour("unlock house", commandColour)}
          |${this.getLocationInfo}""".stripMargin
   }
 
@@ -148,8 +148,16 @@ class Player(private val game: Game):
   def inspect(itemName: String): String = {
     if this.inventory.exists(_.name == "writing book") || this.location.items.exists(_.name == "writing book") then
       this.game.writingBook.use + "\n" + this.getLocationInfo
+    else if this.location.items.exists(_.name.toLowerCase == "emf reader") then
+      this.game.emfReader.use + "\n" + this.getLocationInfo
     else
       s"You don't have any items to inspect. You can only inspect ${this.game.writingBook.toString}"
+  }
+
+  def observe: String = {
+    var text = ""
+    text += this.location.items.map(_.use).mkString("\n")
+    text + "\n" + this.getLocationInfo
   }
 
   def getInventoryText = {
@@ -158,7 +166,7 @@ class Player(private val game: Game):
   }
 
   def isHearingEMFReader: Boolean = {
-    if !(this.inventory contains this.game.emfReader) && this.location.hasItem("emfReader") then
+    if !(this.inventory contains this.game.emfReader) && this.location.hasItem("emf reader") then
       this.game.ghost.getEMFLevel > 1
     else
       false

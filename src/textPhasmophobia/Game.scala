@@ -157,32 +157,35 @@ class Game:
       this.area.getAllRoomsExceptTruck.foreach(_.updateTemperature())
   }
 
-  def playTurn(command: String): String = {
-    if this.isGameStarted then
-      this.updateRoomTemps()
-      this.ghost.attemptInteraction()
-
-    val outcomeReport = Action(command, this).execute()
-    if outcomeReport.isDefined && Vector("test", "learn", "tutorial", "help").forall(text => !(command contains text)) then
-      this.turnCount += 1
-
-    // TODO move out of playTurn
-    outcomeReport match {
+  private def checkTurnHearing(actionReport: Option[String], command: String): String = {
+    actionReport match {
       case Some(message) => {
         var text = ""
 
         if this.ghost.ifInteractedThisTurn && this.player.isInGhostRoom then
           text = "You hear the ghost interacting with something. Check it out with EMF reader!\n"
 
-        if this.player.isHearingEMFReader then
-          text = s"You hear ${this.emfReader.toString} beeping for level ${this.ghost.getEMFLevel}\n"
+        if this.player.isHearingEMFReader && !(command contains "observe") then
+          text += s"You hear ${this.emfReader.toString} beeping for level ${this.ghost.getEMFLevel}\n"
           if this.ghost.getEMFLevel == 5 then
-            text += this.emfReader.evidenceText + "\n"
+            this.player.addEvidence("EMF 5")
 
         text + message
       }
       case None => s"""Unknown command: "$command"."""
-
     }
+  }
+
+  def playTurn(command: String): String = {
+    if this.isGameStarted then
+      this.updateRoomTemps()
+      this.ghost.attemptInteraction()
+
+    val outcomeReport = Action(command, this).execute()
+
+    if outcomeReport.isDefined && Vector("test", "learn", "tutorial", "help").forall(text => !(command contains text)) then
+      this.turnCount += 1
+
+    this.checkTurnHearing(outcomeReport, command)
   }
 end Game
