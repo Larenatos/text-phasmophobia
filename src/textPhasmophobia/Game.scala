@@ -1,6 +1,30 @@
 package textPhasmophobia
 
 class Game:
+  // variables for the whole game
+  private var turnCount = 0
+  private var unlockHouseTurn = 0
+  private var isObjectiveDone = false
+  private var isGameStarted = false
+  private var isHouseUnlocked = false
+  private var isObjectiveCompleted = false
+  private var isQuit = false
+
+  val area = Area(this)
+  val player = Player(this)
+  val ghost = Ghost(this)
+
+  // items for the investigation
+  val thermometer = Thermometer(this)
+  val spiritBox = SpiritBox(this)
+  val videoCamera = VideoCamera(this)
+  val writingBook = WritingBook(this)
+  val emfReader = EMFReader(this)
+  val dotsProjector = DotsProjector(this)
+
+  val investigationItems = Vector(this.thermometer, this.spiritBox, this.videoCamera, this.writingBook, this.emfReader, this.dotsProjector)
+
+  // text messages
   val welcomeMessage =
     s"""\nThis is phasmophobia in text form. The game has you enter a haunted hause and your task is to find out what type of ghost it is.
        |You can always type ${textWithColour("help", commandColour)} the get list of all the commands you can use and their description. Try it out!
@@ -23,7 +47,7 @@ class Game:
        |${textWithColour("use <item>", commandColour)}      - Uses ${textWithColour("<item>", itemColour)} from players inventory and you will get a result for using that item
        |${textWithColour("equip <item>", commandColour)}    - Equips ${textWithColour("<item>", itemColour)} and after that when ever you go to a room you will use that item and get results. Easy way to find where the ghost is
        |${textWithColour("inspect <item>", commandColour)}  - Inspects ${textWithColour("<item>", itemColour)} and you get info of that item. You can only inspect ${textWithColour("writing book", itemColour)} to see if the ghost has written to it. This is one type of ${textWithColour("evidence", evidenceColour)}
-       |${textWithColour("observe", commandColour)}         - Adds a turn and use it when waiting for something to happen like ghost interaction for emf and writing book
+       |${textWithColour("observe", commandColour)}         - Adds a turn and use it when waiting for something to happen like ghost interaction. This command will print output for items: ${this.writingBook}, ${this.emfReader}, ${this.dotsProjector}
        |${textWithColour("finish", commandColour)}          - Finish an investigation if you are in the truck and you have started an investigation
        |${textWithColour("quit", commandColour)}            - Quit the whole game program
        |
@@ -54,14 +78,12 @@ class Game:
     s"""There are ${ghostTypes.keys.toVector.length} ghost types currently: ${ghostTypes.keys.map(textWithColour(_, ghostColour)).mkString(", ")}
        |Each of them have different ${textWithColour("evidence", evidenceColour)} that you need to test for. Find out more about each ${textWithColour("evidence", evidenceColour)} with ${textWithColour("learn evidence", commandColour)}
        |The ${textWithColour("evidence", evidenceColour)} for each ghost are:
-       |${ghostTypes.keys.map(key => s"${textWithColour(key, ghostColour)}: " + ghostTypes(key).map(textWithColour(_, evidenceColour)).mkString(", ")).mkString("\n")}""".stripMargin
+       |${ghostTypes.keys.map(key => s"${textWithColour(key, ghostColour)}" + " "*(10 - key.length) + "- "+ ghostTypes(key).map(_.toString).mkString(", ")).mkString("\n")}""".stripMargin
   val learnEvidenceText =
-    s"""There are 4 ${textWithColour("evidence", evidenceColour)} types: ${"freezing,ghost orb,writing,spirit box".split(",").map(textWithColour(_, evidenceColour)).mkString(", ")}. Here is a brief introduction to them
-       |${textWithColour("freezing", evidenceColour)}   - The temperature in the ghost room can be lower than 1 Celsius. You can check for this with the ${textWithColour("thermometer", itemColour)}. You will have to check the temperature multiple times
-       |${textWithColour("ghost orb", evidenceColour)}  - Ghost can have a floating orb in the ghost room. It is only visible through ${textWithColour("video camera", itemColour)}
-       |${textWithColour("writing", evidenceColour)}    - While a ${textWithColour("writing book", itemColour)} is in the ghost room the ghost has a chance to write something in it. The book has to be dropped onto the floor first. You have to ${textWithColour("inspect", commandColour)} the ${textWithColour("writing book", itemColour)} to see if the ghost has written in it
-       |${textWithColour("spirit box", evidenceColour)} - The ghost will give a response when using ${textWithColour("spirit box", itemColour)} in the ghost room""".stripMargin
+    s"""There are ${allEvidence.length} evidence types: ${allEvidence.map(_.toString).mkString(", ")}. Here is a brief introduction of them
+       |${allEvidence.map(_.learn).mkString("\n")}""".stripMargin
 
+  // start of methods
   def getLearnText(target: String): String = {
     target match {
       case "ghost"    => this.learnGhostText
@@ -70,36 +92,17 @@ class Game:
     }
   }
 
-  private var turnCount = 0
-  private var unlockHouseTurn = 0
-  private var isObjectiveDone = false
-  private var isGameStarted = false
-  private var isHouseUnlocked = false
-  private var isObjectiveCompleted = false
-  private var isQuit = false
-
-  val area = Area(this)
-  val player = Player(this)
-  val ghost = Ghost(this)
-
-  // items for the investigation
-  val thermometer = Thermometer(this)
-  val spiritBox = SpiritBox(this)
-  val videoCamera = VideoCamera(this)
-  val writingBook = WritingBook(this)
-  val emfReader = EMFReader(this)
-
-  val investigationItems = Vector(this.thermometer, this.spiritBox, this.videoCamera, this.writingBook, this.emfReader)
-
   def isGameRunning = this.isGameStarted
 
   def hasHouseBeenUnlocked = this.isHouseUnlocked
 
-  def completeObjective() =
+  def completeObjective() = {
     this.isObjectiveCompleted = true
+  }
 
-  def playerQuit(): Unit =
+  def playerQuit(): Unit = {
     this.isQuit = true
+  }
 
   def isOver = this.isQuit
 
@@ -165,10 +168,13 @@ class Game:
         if this.ghost.ifInteractedThisTurn && this.player.isInGhostRoom then
           text = "You hear the ghost interacting with something. Check it out with EMF reader!\n"
 
-        if this.player.isHearingEMFReader && !(command contains "observe") then
-          text += s"You hear ${this.emfReader.toString} beeping for level ${this.ghost.getEMFLevel}\n"
-          if this.ghost.getEMFLevel == 5 then
-            this.player.addEvidence("EMF 5")
+        if !(command contains "observe") then
+          if this.player.isHearingEMFReader then
+            text += s"You hear ${this.emfReader.toString} beeping for level ${this.ghost.getEMFLevel}\n"
+            if this.ghost.getEMFLevel == 5 then
+              this.player.addEvidence(emf5)
+          if this.player.isSeeingDOTS then
+            text += this.dotsProjector.use + "\n"
 
         text + message
       }

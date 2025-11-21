@@ -4,7 +4,7 @@ import scala.collection.mutable.Buffer
 
 class Player(private val game: Game):
   val inventory: Buffer[Item] = Buffer.empty
-  val evidence: Buffer[String] = Buffer.empty
+  val evidence: Buffer[Evidence] = Buffer.empty
 
   private var mapLocation = ""
   private var accessibleRooms = this.game.area.getAccessibleRooms(this.mapLocation)
@@ -37,7 +37,7 @@ class Player(private val game: Game):
        |This room has ${if this.location.items.nonEmpty then this.location.items.map(_.toString).mkString(", ") else "no items"}""".stripMargin
   }
 
-  def addEvidence(evidence: String) = {
+  def addEvidence(evidence: Evidence) = {
     if !(this.evidence contains evidence) then
       this.evidence.append(evidence)
   }
@@ -60,11 +60,11 @@ class Player(private val game: Game):
     else if this.evidence.length == 3 then
       val ghostType = ghostTypes.filter((name, evidence) => this.evidence.forall(evidence contains _)).keys.toVector(0)
       this.game.completeObjective()
-      s"""Evidence you have found: ${this.evidence.map(textWithColour(_, evidenceColour)).mkString(", ")} and the ghost is ${textWithColour(ghostType, ghostColour)}
+      s"""Evidence you have found: ${this.evidence.map(_.toString).mkString(", ")} and the ghost is ${textWithColour(ghostType, ghostColour)}
          |You can now finish investigation from ${textWithColour("truck", roomColour)} with ${textWithColour("finish", commandColour)}
          |${this.getLocationInfo}""".stripMargin
     else
-      s"""Evidence you have found: ${this.evidence.map(textWithColour(_, evidenceColour)).mkString(", ")}. The ghost could be ${ghostTypes.filter((name, evidence) => this.evidence.forall(evidence contains _)).keys.map(textWithColour(_, ghostColour)).mkString(", ")}
+      s"""Evidence you have found: ${this.evidence.map(_.toString).mkString(", ")}. The ghost could be ${ghostTypes.filter((name, evidence) => this.evidence.forall(evidence contains _)).keys.map(textWithColour(_, ghostColour)).mkString(", ")}
          |${this.getLocationInfo}""".stripMargin
   }
 
@@ -156,7 +156,7 @@ class Player(private val game: Game):
 
   def observe: String = {
     var text = ""
-    text += this.location.items.map(_.use).mkString("\n")
+    text += this.location.items.filter(item => (this.evidence contains ghostWriting) && item != this.game.writingBook).map(_.use).filter(_.nonEmpty).mkString("\n")
     text + "\n" + this.getLocationInfo
   }
 
@@ -170,6 +170,10 @@ class Player(private val game: Game):
       this.game.ghost.getEMFLevel > 1
     else
       false
+  }
+
+  def isSeeingDOTS: Boolean = {
+    this.game.ghost.getIsDoingDOTS
   }
 
   def quit = {
