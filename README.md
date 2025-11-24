@@ -34,36 +34,36 @@ The player is to use different items to test if that is a type of evidence for t
 ### command          | explanation
 
 
-- tutorial         | Give the player introduction to how the game works and explain all possible commands
-- start            | Start an investigation. This is the actual gameplay
-- unlock house     | Use a key to unlock a door to a house
-- take thermometer | the usage of these items will be displayed when they are picked up for the first time.
-- take emf reader
-- take dots projector
-- inventory         | See the items you have. You can have max 3 items
-- equip thermometer | Show temperature in every room that the player goes to. Easier to find the ghost room
-- go foyer          | start moving in the house. Possible rooms to go to are displayed as a result of this command
-- go bathroom       | You are looking for a room with temperature below 15 celsius
-- go foyer
-- go living room
-- go basement
-- go living room
-- go kitchen         | You may need to explore all the house to find where to ghost is. The layout is shown in the map.png
-- drop dots projector| place on the ground. Only way for this to work
-- drop emf reader    | Can be used from hand or dropped on the ground because it makes a noise
-- drop thermometer   | Leave this here too.
-- journal            | check what evidence I have found and what the ghost type could be
-- learn ghost        | list all ghost types and their evidence
-- go truck           | grab more items. The possible ghost types
-- take writing book
-- take video camera
-- take spirit box    | now head back to ghost room
-- go foyer
-- go living room
-- go kitchen
-- drop writing book  | Now just check for more evidences
-- use spirit box     | Some evidence might come from emf reader or dots you dropped
-- use video camera
-- observe            | Wait for ghost to interact if you did not get all 3 evidence yet
-- go truck           | Once you get all 3 evidcence.
-- finish             | Now you can start a new investigation which will be different or just stop
+- **tutorial**         | Give the player introduction to how the game works and explain all possible commands
+- **start**            | Start an investigation. This is the actual gameplay
+- **unlock house**     | Use a key to unlock a door to a house
+- **take thermometer** | the usage of these items will be displayed when they are picked up for the first time.
+- **take emf reader**
+- **take dots projector**
+- **inventory**         | See the items you have. You can have max 3 items
+- **equip thermometer** | Show temperature in every room that the player goes to. Easier to find the ghost room
+- **go foyer**          | start moving in the house. Possible rooms to go to are displayed as a result of this command
+- **go bathroom**       | You are looking for a room with temperature below 15 celsius
+- **go foyer**
+- **go living room**
+- **go basement**
+- **go living room**
+- **go kitchen**         | You may need to explore all the house to find where to ghost is. The layout is shown in the map.png
+- **drop dots projector**| place on the ground. Only way for this to work
+- **drop emf reader**    | Can be used from hand or dropped on the ground because it makes a noise
+- **drop thermometer**   | Leave this here too.
+- **journal**            | check what evidence I have found and what the ghost type could be
+- **learn ghost**        | list all ghost types and their evidence
+- **go truck**           | grab more items. The possible ghost types
+- **take writing book**
+- **take video camera**
+- **take spirit box**    | now head back to ghost room
+- **go foyer**
+- **go living room**
+- **go kitchen**
+- **drop writing book**  | Now just check for more evidences
+- **use spirit box**     | Some evidence might come from emf reader or dots you dropped
+- **use video camera**
+- **observe**            | Wait for ghost to interact if you did not get all 3 evidence yet
+- **go truck**           | Once you get all 3 evidcence.
+- **finish**             | Now you can start a new investigation which will be different or just stop
