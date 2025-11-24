@@ -65,7 +65,7 @@ class SpiritBox(game: Game) extends Item(game):
       this.addEvidence()
       s"You got a response from the ghost in ${this.evidence}. This is an evidence for the ghost." + this.evidenceText
     else
-      "You get no response"
+      s"You get no response in ${this.toString}"
   }
 end SpiritBox
 

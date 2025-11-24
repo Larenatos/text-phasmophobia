@@ -144,13 +144,13 @@ class Game:
 
   def leaveInvestigation(): String = {
     if this.player.location.name == "truck" then
-      val objectiveText = if this.isObjectiveCompleted then "You completed the objective. Good job!" else "You did not complete the objective"
+      val objectiveText = if this.isObjectiveCompleted then "You completed the objective. You found out the ghost type. Good job!" else "You did not complete the objective"
       this.isGameStarted = false
-        s"""You finished an invenstigation!
-           |${objectiveText}
-           |Your investigation lasted for ${this.turnCount} turns
-           |The ghost was ${this.ghost} and it's favourite room was ${this.ghost.getFavRoom}
-           |You can start a new investigation by entering the ${textWithColour("start", commandColour)} again!""".stripMargin
+      s"""You finished an invenstigation!
+         |${objectiveText}
+         |Your investigation lasted for ${this.turnCount} turns
+         |The ghost was ${this.ghost} and it's favourite room was ${this.ghost.getFavRoom}
+         |You can start a new investigation by entering the ${textWithColour("start", commandColour)} again!""".stripMargin
     else
       "You need to be in the truck to be able to leave"
   }

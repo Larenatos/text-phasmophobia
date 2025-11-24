@@ -9,15 +9,15 @@ class Action(input: String, private val game: Game):
     s"""Start an investigation first!
        |You can do that by entering the command ${textWithColour("start", commandColour)}""".stripMargin
 
-  private def test(target: String): String = {
-    target.toLowerCase() match {
-      case "area" => {
-        this.game.area.getMapString + "\nAll rooms: " + this.game.area.getAllRoomsExceptTruck.mkString(", ")
-      }
-      case "ghost" => this.game.ghost.test
-      case other => s"There is no: ${target} to test"
-    }
-  }
+//  private def test(target: String): String = {
+//    target.toLowerCase() match {
+//      case "area" => {
+//        this.game.area.getMapString + "\nAll rooms: " + this.game.area.getAllRoomsExceptTruck.mkString(", ")
+//      }
+//      case "ghost" => this.game.ghost.test
+//      case other => s"There is no: ${target} to test"
+//    }
+//  }
 
   // Two different methods where one takes in function that take parameters
   private def runGameCommand(command: String => String): Option[String] = {
@@ -52,7 +52,7 @@ class Action(input: String, private val game: Game):
       case "observe"   => runGameCommand(() => this.game.player.observe)
       case "finish"    => runGameCommand(() => this.game.leaveInvestigation())
       case "quit"      => Some(this.game.player.quit)
-      case "test"      => Some(this.test(this.modifiers))
+//      case "test"      => Some(this.test(this.modifiers))
       case other       => None
     }
   }

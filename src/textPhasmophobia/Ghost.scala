@@ -29,7 +29,7 @@ class Ghost(private val game: Game):
   private var turnsSinceDots = 0
 
   def reset(): Unit = {
-    this.kind = "Oni" //ghostTypes.keys.toVector(Random.nextInt(ghostTypes.keys.toVector.length))
+    this.kind = ghostTypes.keys.toVector(Random.nextInt(ghostTypes.keys.toVector.length))
     this.favRoom = this.game.area.getAllRoomsExceptTruck(Random.nextInt(this.game.area.getAllRoomsExceptTruck.length))
   }
 
@@ -37,7 +37,7 @@ class Ghost(private val game: Game):
 
   def getFavRoom = this.favRoom
 
-  def test = s"Favourite room: ${this.favRoom}\nKind: ${this}"
+//  def test = s"Favourite room: ${this.favRoom}\nKind: ${this}\nEvidence:${this.evidence.mkString(", ")}"
 
   def getKind = this.kind
 
@@ -54,7 +54,7 @@ class Ghost(private val game: Game):
     if this.interactionTime == 0 && this.emfLevel != 1 then
       this.emfLevel = 1
 
-    if this.favRoom.hasItem(this.game.dotsProjector.name) && turnsSinceDots > 1 && Random.nextFloat() < 0.34 then
+    if (this.evidence contains dots) && this.favRoom.hasItem(this.game.dotsProjector.name) && turnsSinceDots > 1 && Random.nextFloat() < 0.34 then
       this.isDoingDOTS = true
       this.turnsSinceDots = 0
     else if this.isDoingDOTS then
@@ -66,10 +66,10 @@ class Ghost(private val game: Game):
       this.interactionTime = this.interactionEMFDuration
 
       // maybe trigger writing book if it is in the ghost room
-      if (this.evidence contains "ghost writing") && this.favRoom.items.exists(_.name == "writing book") && Random.nextFloat() < 0.4 then
+      if (this.evidence contains ghostWriting) && this.favRoom.items.exists(_.name == "writing book") && Random.nextFloat() < 0.5 then
         this.game.writingBook.trigger()
 
-      this.emfLevel = if this.evidence contains "EMF 5" then 5 else 2
+      this.emfLevel = if this.evidence contains emf5 then 5 else 2
   }
 
   override def toString: String = textWithColour(this.kind, ghostColour)

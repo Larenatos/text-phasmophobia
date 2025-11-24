@@ -71,9 +71,9 @@ class Area(private val game: Game):
     (indent + current.value.toString) +: childStrings
   }
 
-  def getMapString = {
-    s"""Map test printout:
-       |Text version of the rooms:
-       |${this.printTree(this.rooms, "").mkString("\n")}""".stripMargin
-  }
+//  def getMapString = {
+//    s"""Map test printout:
+//       |Text version of the rooms:
+//       |${this.printTree(this.rooms, "").mkString("\n")}""".stripMargin
+//  }
 end Area

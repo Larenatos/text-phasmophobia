@@ -43,14 +43,23 @@ class Player(private val game: Game):
   }
 
   def equipItem(itemName: String): String = {
-    if this.inventory.exists(_.name == itemName) && (Vector("thermometer", "video camera", "spirit box") contains itemName) then
-      val item = this.inventory.filter(_.name == itemName).head
-      this.equippedItem = Some(item)
-      s"""You have now equipped ${textWithColour(itemName, itemColour)}. When you enter a room you will get info from this item.
-         |${this.getLocationInfo}""".stripMargin
-    else
-      s"""${textWithColour(itemName, itemColour)} is not equippaple or you don't have that item in your inventory
-         |${this.getLocationInfo}""".stripMargin
+    val unableText = s"""${textWithColour(itemName, itemColour)} is not equippaple or you don't have that item in your inventory
+                        |${this.getLocationInfo}""".stripMargin
+    val item = this.inventory.find(_.name.toLowerCase == itemName)
+
+    item match {
+      case Some(value) => {
+        if Vector("thermometer", "video camera", "spirit box", "emf reader") contains itemName then
+          this.equippedItem = item
+          s"""You have now equipped ${textWithColour(itemName, itemColour)}. When you enter a room you will get info from this item.
+             |${value.use}""".stripMargin
+        else
+          unableText
+      }
+      case None => {
+        unableText
+      }
+    }
   }
 
   def getEvidenceInfo: String = {
@@ -100,7 +109,7 @@ class Player(private val game: Game):
   }
 
   def isInGhostRoom: Boolean = {
-    this.location.name == this.game.ghost.getFavRoom.name
+    this.location == this.game.ghost.getFavRoom
   }
 
   def take(itemName: String): String = {
@@ -123,6 +132,11 @@ class Player(private val game: Game):
       case Some(item) => {
         this.inventory.remove(this.inventory.indexOf(item))
         this.location.addItem(item)
+        this.equippedItem match {
+          case Some(item) => if item.name == itemName then this.equippedItem = None
+          case None =>
+        }
+
         s"""You place ${textWithColour(itemName, itemColour)} in ${textWithColour(this.location.name, roomColour)}
          |${this.getLocationInfo}""".stripMargin
       }
@@ -156,7 +170,7 @@ class Player(private val game: Game):
 
   def observe: String = {
     var text = ""
-    text += this.location.items.filter(item => (this.evidence contains ghostWriting) && item != this.game.writingBook).map(_.use).filter(_.nonEmpty).mkString("\n")
+    text += this.location.items.filter(item => (item != this.game.writingBook || (this.evidence contains ghostWriting)) && (this.evidence contains item.evidence)).map(_.use).filter(_.nonEmpty).mkString("\n")
     text + "\n" + this.getLocationInfo
   }
 
@@ -167,13 +181,13 @@ class Player(private val game: Game):
 
   def isHearingEMFReader: Boolean = {
     if !(this.inventory contains this.game.emfReader) && this.location.hasItem("emf reader") then
-      this.game.ghost.getEMFLevel > 1
+      this.game.ghost.getEMFLevel > 1 && this.isInGhostRoom
     else
       false
   }
 
   def isSeeingDOTS: Boolean = {
-    this.game.ghost.getIsDoingDOTS
+    this.game.ghost.getIsDoingDOTS && this.isInGhostRoom
   }
 
   def quit = {

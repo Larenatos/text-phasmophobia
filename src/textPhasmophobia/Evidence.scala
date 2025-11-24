@@ -19,5 +19,4 @@ val ghostOrb = Evidence("ghost orb", ghostOrbInfo)
 val ghostWriting = Evidence("ghost writing", ghostWritingInfo)
 val emf5 = Evidence("EMF 5", emf5Info)
 val dots = Evidence("DOTS", dotsInfo)
-
 val allEvidence = Vector(spiritBox, freezing, ghostOrb, ghostWriting, emf5, dots)
