@@ -1,12 +1,18 @@
-To run my game go to src / textPhasmophobia / ui / TextUI
+# Text phasmophobia
+
+This game is a simplified version of an investigation from the game **Phasmophobia**.
+This is missing some key features like hunts. It may be developed later on.
+This game so far has Tanglewood as the map and players task is to use items to figure out
+what the ghost type is that is haunting this house. Ultraviolet light is missing but every other 6 evidence type has been implemented.
+
+It is recommended to run this game with `Windows Terminal` if you don't have it yet (It is the default in `Windows 11`).
+
+## How to play
+
+To run this game, go to src / textPhasmophobia / ui / TextUI
 Specifically you need to run the main class `TextUI` in there.
 
-There is a map.png to visualize the layout of the map.
-The game also tells what rooms the player can move to at any point.
-
-The player should read through tutorial before playing and reading what the game tells you.
-There is a small walkthrough in tutorial in the game itself.
-There is a longer walkthrough below this text.
+## Information about this game
 
 The idea of the game is explained in the app itself but here it is briefly.
 
@@ -16,7 +22,14 @@ They are used in the ghost favourite room. Which is randomly chosen when the use
 There are multiple types of evidence and each ghost has 3 of them which are randomly chosen also.
 The player is to use different items to test if that is a type of evidence for the ghost.
 
-Example walkthrough:
+The player should read through tutorial before playing and reading everything that the game tells you.
+There is a small walkthrough in tutorial in the game itself.
+There is a longer walkthrough below this text.
+
+There is a `map.png` at repository root to visualize the layout of the map.
+The game also tells what rooms the player can move to at any point. Truck is always accessible.
+
+## Example walkthrough:
 
 command            - explanation
 
