@@ -133,8 +133,8 @@ class Player(private val game: Game):
         this.inventory.remove(this.inventory.indexOf(item))
         this.location.addItem(item)
         this.equippedItem match {
-          case Some(item) => if item.name == itemName then this.equippedItem = None
-          case None =>
+          case Some(item) => if item.name.toLowerCase == itemName then this.equippedItem = None
+          case None => this.equippedItem = None
         }
 
         s"""You place ${textWithColour(itemName, itemColour)} in ${textWithColour(this.location.name, roomColour)}

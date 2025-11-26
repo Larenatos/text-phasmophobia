@@ -103,7 +103,7 @@ class EMFReader(game: Game) extends Item(game):
   }
 
   def use: String = {
-    val emfLevel = this.game.ghost.getEMFLevel
+    val emfLevel = if this.game.player.isInGhostRoom || this.game.ghost.getFavRoom.hasItem("emf reader") then this.game.ghost.getEMFLevel else 1
     if emfLevel > 1 then
       if emfLevel == 5 then
         this.addEvidence()

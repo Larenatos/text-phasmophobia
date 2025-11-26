@@ -134,12 +134,15 @@ class Game:
 
   def unlock(target: String): String = {
     if target == "house" then
-      this.unlockHouseTurn = this.turnCount
-      this.isHouseUnlocked = true
-      s"""House is now unlocked. Now the ghost will start to interact with stuff and the ${textWithColour("temperature", temperatureColour)} will start to drop in the ghost room
-         |${this.player.getLocationInfo}""".stripMargin
+      if this.isHouseUnlocked then
+        "House is already unlocked"
+      else
+        this.unlockHouseTurn = this.turnCount
+        this.isHouseUnlocked = true
+        s"""House is now unlocked. Now the ghost will start to interact with stuff and the ${textWithColour("temperature", temperatureColour)} will start to drop in the ghost room
+           |${this.player.getLocationInfo}""".stripMargin
     else
-      "House is already unlocked"
+      s"You can't unlock ${target}"
   }
 
   def leaveInvestigation(): String = {
